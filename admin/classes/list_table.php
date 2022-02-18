@@ -7,24 +7,27 @@
  * @since 3.1.0
  * @access private
  */
- 
-class WP_SF_List_Table extends WP_List_Table {
 
-	var $callback_args;
-	var $objects = array();
-	var $public = true;
-	var $setting_prefix = '';
-	
-	function WP_SF_List_Table($objects, $public = true, $setting_prefix = '') {
+namespace Ajaxy\LiveSearch\Admin\Classes;
+ 
+class List_Table extends \WP_List_Table {
+
+	private $callback_args;
+	private $public = true;
+	private $setting_prefix = '';
+	private $row_class = '';
+
+	function __construct($objects, $public = true, $setting_prefix = '') {
 		parent::__construct( array(
 			'plural' => 'Settings',
 			'singular' => 'Setting',
 		) );
-		$this->objects = $objects;
+		$this->items = $objects;
 		$this->public = $public;
 		$this->setting_prefix = $setting_prefix;
+		$this->prepare_items();
 	}
-	var $row_class = '';
+	
 	function ajax_user_can() {
 		return true;
 	}
@@ -47,14 +50,9 @@ class WP_SF_List_Table extends WP_List_Table {
 		$this->callback_args = $args;
 
 		$this->set_pagination_args( array(
-			'total_items' => sizeof($this->objects),
+			'total_items' => sizeof($this->items),
 			'per_page' => 10,
 		) );
-	}
-
-	function has_items() {
-		// todo: populate $this->items in prepare_items()
-		return true;
 	}
 
 	function get_bulk_actions() {
@@ -89,12 +87,10 @@ class WP_SF_List_Table extends WP_List_Table {
 		if ( isset( $this->_column_headers ) )
 			return $this->_column_headers;
 
-		$screen = get_current_screen();
-
 		$columns = $this->get_columns();
 		$hidden = array();
 
-		$this->_column_headers = array( $columns, $hidden, $this->get_sortable_columns() );
+		$this->_column_headers = array( $columns, $hidden, $this->get_sortable_columns(), 'cb' );
 
 		return $this->_column_headers;
 	}
@@ -114,37 +110,19 @@ class WP_SF_List_Table extends WP_List_Table {
 
 		extract( $args, EXTR_SKIP );
 
-		$args['offset'] = $offset = ( $page - 1 ) * $number;
+		$args['offset'] = ( $page - 1 ) * $number;
 
 		// convert it to table rows
 		$out = '';
-		$count = 0;
-		$orderby = 'order';
 		$_REQUEST['order'] = (isset($_REQUEST['order']) ? $_REQUEST['order'] :'');
 		$_REQUEST['orderby'] = (isset($_REQUEST['orderby']) ? $_REQUEST['orderby'] :'');
-		$order = (in_array($_REQUEST['order'], array('asc','desc')) ? $_REQUEST['order']: 'asc');
-		switch($_REQUEST['orderby']){
-			case 'n':
-				$orderby = 'name';
-				break;
-			case 'o':
-				$orderby = 'order';
-				break;
-			case 't':
-				$orderby = 'type';
-				break;
-			default:
-				$orderby = 'order';
-				break;
-		}
 
-		if(!empty($this->objects)){
-			foreach($this->objects as $object){
+		if(!empty($this->items)){
+			foreach($this->items as $object){
 				$this->single_row($object);
 			}
 		}
-		if ( empty( $this->objects ) ) {
-			list( $columns, $hidden ) = $this->get_column_info();
+		if ( empty( $this->items ) ) {
 			echo '<tr class="no-items"><td class="colspanchange" colspan="' . $this->get_column_count() . '">';
 			$this->no_items();
 			echo '</td></tr>';
@@ -223,14 +201,6 @@ class WP_SF_List_Table extends WP_List_Table {
 	}
 	function column_default( $field, $column_name ) {
 		return $field[$column_name];
-	}
-
-	/**
-	 * Outputs the hidden row displayed when inline editing
-	 *
-	 * @since 3.1.0
-	 */
-	function inline_edit() {
 	}
 }
 

@@ -2,8 +2,8 @@
 
 class AJAXY_SF_WIDGET extends WP_Widget 
 {
-	function AJAXY_SF_WIDGET() {
-		parent::WP_Widget( false, $name = 'Ajaxy live search' );	
+	function __construct() {
+		parent::__construct( false, $name = 'Ajaxy live search' );	
 	}
 	function widget( $args, $instance ) 
 	{

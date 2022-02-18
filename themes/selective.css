@@ -1,4 +1,4 @@
-.sf_ajaxy-selective-search {
+.sf-loadingajaxy-selective-search {
     width: 467px;
     max-width: 100%;
 	border-width:1px;
@@ -9,7 +9,7 @@
 	cursor:text;
 }
 
-.sf_ajaxy-selective-item {
+.sf-loadingajaxy-selective-item {
     cursor: default;
     display: inline-block;
     height: 19px;
@@ -22,7 +22,7 @@
 	margin:0 2px;
 }
 
-.sf_ajaxy-selective-close {
+.sf-loadingajaxy-selective-close {
     display: inline;
     height: auto;
     text-align: center;
@@ -35,7 +35,7 @@
 	padding: 0 0 0 8px;
 }
 
-.sf_ajaxy-selective-search input.sf_ajaxy-selective-input {
+.sf-loadingajaxy-selective-search input.sf-loadingajaxy-selective-input {
     margin: 0px;
     padding: 5px 2px;
     box-shadow: none;

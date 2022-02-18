@@ -1,20 +1,20 @@
-#sf_results
+.sf-results
 {
 	background:#ebeeff;
 	border: 1px solid #9BADD3;
 	padding-top:3px;
 }
-#sf_val li.sf_more
+.sf-val li.sf-loadingmore
 {
 	border-top: 1px solid #A3C0FF;
 	background: #CAD2FC;
 }
-#sf_val ul ul li
+.sf-val ul ul li
 {
 	border-color: #D1D6FA;
 	border-top-width: 0;
 }
-.sf_sb_top
+.sf-loadingsb_top
 {
 	background-image: url("images/arrow.png") !important;
 	background-repeat: no-repeat !important;
@@ -27,77 +27,77 @@
 	position:absolute;
 	z-index: 9 !important;
 }
-#sf_val ul li.sf_selected
+.sf-val ul li.sf-loadingselected
 {
 	background-color: #D7DDFF !important;
 	border-color: #B5C5E7 !important;
 }
-#sf_val ul li.sf_selected .sf_text
+.sf-val ul li.sf-loadingselected .sf-loadingtext
 {
 	color: #314E8B !important;
 }
-#sf_val ul li.sf_selected .sf_small
+.sf-val ul li.sf-loadingselected .sf-loadingsmall
 {
 	color: #98A4BE !important;
 }
 
-#sf_val ul li.sf_selected a, #sf_val ul li.sf_selected span
+.sf-val ul li.sf-loadingselected a, .sf-val ul li.sf-loadingselected span
 {
 	color: #314E8B !important;
 }
-#sf_val ul li.sf_item
+.sf-val ul li.sf-loadingitem
 {
 	border-color: #ebeeff;
 }
-#sf_val ul li.sf_item a
+.sf-val ul li.sf-loadingitem a
 {
 	color: #3B5998;
 }
-#sf_val ul li.sf_header
+.sf-val ul li.sf-loadingheader
 {
 	background:#CAD2FC;
 	border-bottom:1px solid #B6C1FA;;
 }
-#sf_val li.sf_item img
+.sf-val li.sf-loadingitem img
 {
 	background-color: #ECEFF5;
 }
-#sf_val li .sf_small
+.sf-val li .sf-loadingsmall
 {
 	color: #98A4BE !important;
 }
-#sf_val li.sf_more .sf_text
+.sf-val li.sf-loadingmore .sf-loadingtext
 {
 	color: #3B5998;
 }
 
-.sf_search .sf_input{
+.sf-loadingsearch .sf-loadinginput{
 	color:#aaa !important;
 	background:#fff !important;
 }
-.sf_search .sf_focused{
+.sf-loadingsearch .sf-loadingfocused{
 	color:#333 !important;
 	font-style:normal !important;
 }
-.sf_search
+.sf-loadingsearch
 {	
 	background:#fff;
 }
-.sf_search .sf_button,.sf_search  .searchsubmit
+.sf-loadingsearch .sf-loadingbutton,.sf-loadingsearch  .searchsubmit
 {
 	background-image: url("images/sf_search.png") !important;
 	background-repeat: no-repeat !important;
 	background-position: 0px 0 !important;
 	background-color: white !important;
 }
-#sf_loading
+.sf-loading
 {
 	background-image: url("images/sf_loading.gif") !important;
 	background-repeat: no-repeat !important;
 	background-position: center center !important;
 }
 /* selective search css */
-.sf_ajaxy-selective-search {
+.sf-loadingajaxy-selective-search {
     color: rgba(255, 255, 255, 0.498039);
     text-decoration: none solid rgba(255, 255, 255, 0.498039);
     background: rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box;
@@ -107,7 +107,7 @@
 }
 
 
-.sf_ajaxy-selective-item {
+.sf-loadingajaxy-selective-item {
     color: rgb(157, 171, 255);
 	text-decoration: none solid rgb(255, 255, 255);
 	background: rgb(235, 238, 255) -webkit-linear-gradient(top, rgb(242, 244, 255), rgb(234, 237, 255)) repeat scroll 0% 0% / auto padding-box border-box;
@@ -119,7 +119,7 @@
 	transition: all 0.218s ease 0s;
 }
 
-.sf_ajaxy-selective-close {
+.sf-loadingajaxy-selective-close {
     color: rgb(157, 171, 255);
     text-decoration: none solid rgb(255, 255, 255);
     border: 0px none rgb(255, 255, 255);
@@ -129,7 +129,7 @@
 	background: transparent;
 }
 
-.sf_ajaxy-selective-search input.sf_ajaxy-selective-input {
+.sf-loadingajaxy-selective-search input.sf-loadingajaxy-selective-input {
     background: rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box;
     border: 0px none rgb(0, 0, 0);
 	box-shadow: 0 0 0;
