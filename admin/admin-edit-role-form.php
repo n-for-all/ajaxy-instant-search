@@ -17,6 +17,7 @@ $roles = $wp_roles->get_names();
 
 $role->label = isset($roles[$role->name]) ?  $roles[$role->name] : $role->name;
 
+/** @var \Ajaxy\LiveSearch\SF $AjaxyLiveSearch */
 global $AjaxyLiveSearch;
 $message = false;
 if (!empty($role)) {

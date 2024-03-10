@@ -1,11 +1,11 @@
 === Plugin Name ===
 Contributors: n-for-all
 Donate link: http://ajaxy.org/
-Version: 3.1.0
+Version: 6.0.0
 Tags: facebook, live search, ajax search, category search, predictive search
-Requires at least: 4.0.0
-Tested up to: 4.9.4
-Stable tag: 3.1.0
+Requires at least: 6.0.0
+Tested up to: 6.2
+Stable tag: 6.0.0
 
 A facebook like ajaxy live search for wordpress, this plugin uses the same functionality as facebook to retrieve the results from your blog.
 
@@ -17,8 +17,6 @@ A facebook like ajaxy live search for wordpress, this plugin uses the same funct
 
 * this plugin can search categories, post tags, post types, taxonomies and supports woocommerce products search and more to go.
 
-* This plugin was a scratch when i created it, Now it is competing with the best wordpress live search plugins out there, it is now supporting all customisation offered by the best live search plugins for wordpress.
-
 == Installation ==
 
 1. Go to plugin, click add new and search for ajax live search, Alternatively you can upload `ajaxy-search-form` folder to the `/wp-content/plugins/` directory
@@ -29,10 +27,6 @@ A facebook like ajaxy live search for wordpress, this plugin uses the same funct
 -Styles are broken?
 
 Each theme has its own styles and might conflict with the search form styles.
-
-- jQuery is undefined?
-
-i have seen a lot of blogs that are having this issue, the problem relies when you include jQuery more than once in your blog file, please note the ajax live search doesn’t include custom jQuery, it uses wordpress built in jQuery script, so make sure there are no other plugins injecting another jQuery version into the HTML.
 
 == Screenshots ==
 1. screenshot-2.jpg
@@ -69,7 +63,6 @@ New Features:
 
 	Shortcode [ajaxy-live-search] added with parameters:
 		label // search label
-		expand // expand input field on click
 		width // input field width
 		border // input field border
 		credits // whether to show or hide author credits

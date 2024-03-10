@@ -187,7 +187,7 @@ msgid "Enter title here"
 msgstr ""
 
 #: admin/admin-settings.php:68 admin/admin-shortcodes.php:46
-msgid "Search Form box"
+msgid "Search Form Box"
 msgstr ""
 
 #: admin/admin-settings.php:73
@@ -244,16 +244,6 @@ msgstr ""
 msgid ""
 "The width of the search form (width is per pixel) - the value should be "
 "integer."
-msgstr ""
-
-#: admin/admin-settings.php:108 admin/admin-shortcodes.php:72
-msgid "Allow expand"
-msgstr ""
-
-#: admin/admin-settings.php:112 admin/admin-shortcodes.php:76
-msgid ""
-"The reduced width of the search form (this will allow the form to expand its "
-"width when it gains focus)."
 msgstr ""
 
 #: admin/admin-settings.php:116 admin/admin-shortcodes.php:80

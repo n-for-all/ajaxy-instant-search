@@ -52,16 +52,7 @@
 {	
 	background:#fff;
 }
-.sf-search .sf-button,.sf-search  .searchsubmit
-{
-	background-image: url("images/sf_search.png") !important;
-	background-repeat: no-repeat !important;
-	background-position: 0px 0 !important;
-	background-color: white !important;
-	-webkit-box-shadow: 0 0 0 0 !important;
-	-moz-box-shadow:0 0 0 0 !important;
-	box-shadow:0 0 0 0 !important;
-}
+
 .sf-loading
 {
 	background-image: url("images/sf_loading.gif") !important;

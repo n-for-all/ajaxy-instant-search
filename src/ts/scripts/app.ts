@@ -1,14 +1,13 @@
 import "whatwg-fetch";
 import offset from "dom-helpers/offset";
-import { animate } from "animate.js";
 
-declare let AjaxyLiveSearchSettings: any;
+declare let AjaxyLiveSearchSettings: any, window: any;
 class SFResults {
 	element: HTMLUListElement;
-	items = [];
-	parent: any;
+	items: Array<HTMLElement> = [];
+	parent: SF;
 	constructor(data, parent) {
-		this.items = []; 
+		this.items = [];
 		this.parent = parent;
 		this.element = document.createElement("ul");
 
@@ -55,7 +54,8 @@ class SFResults {
 						let ul = document.createElement("ul");
 						all.map((result) => {
 							let child = document.createElement("li");
-							child.classList.add("sf-lnk", class_name);
+							let classes = class_name ? class_name.split(" ").map((v) => v.trim()) : [];
+							child.classList.add("sf-lnk", ...classes);
 							child.innerHTML = this.replaceResults(result, template);
 							ul.appendChild(child);
 							this.items.push(child);
@@ -114,9 +114,9 @@ class SFResults {
 			});
 		}
 
-		window.addEventListener("keydown", (event) => {
+		window.addEventListener("keydown", (event: KeyboardEvent) => {
 			if (this.parent.mainElem.style.display != "none") {
-				if (event.key == "38" || event.key == "40") {
+				if (event.key == "ArrowUp" || event.key == "ArrowDown") {
 					var sindex = -1;
 					event.stopPropagation();
 					event.preventDefault();
@@ -129,30 +129,37 @@ class SFResults {
 						return false;
 					});
 
-					if (event.key == "40") {
+					let currentIndex = -1;
+					if (event.key == "ArrowDown") {
 						if (sindex + 1 < this.items.length && this.items[sindex + 1]) {
-							this.items.map((item) => item.classList.remove("sf-selected"));
-							this.items[sindex + 1].classList.add("sf-selected");
+							currentIndex = sindex + 1;
 						}
-					} else if (event.key == "38") {
+					} else if (event.key == "ArrowUp") {
 						if (sindex - 1 > 0 && this.items[sindex - 1]) {
-							this.items.map((item) => item.classList.remove("sf-selected"));
-							this.items[sindex - 1].classList.add("sf-selected");
+							currentIndex = sindex - 1;
 						} else {
-							this.items.map((item) => item.classList.remove("sf-selected"));
-							this.items[0].classList.add("sf-selected");
+							currentIndex = 0;
 						}
 					}
-				} else if (event.key == "27") {
+
+					if (currentIndex >= 0) {
+						this.items.map((item) => item.classList.remove("sf-selected"));
+						this.items[currentIndex].classList.add("sf-selected");
+						this.items[currentIndex].focus();
+					}
+				} else if (event.key == "Escape") {
 					this.parent.mainElem.style.display = "none";
-				} else if (event.key == "13") {
-					let item = this.parent.mainElem.querySelector("li.sf-loadingselected a");
-					var b = item ? item.href : null;
-					if (b && b != "") {
+				} else if (event.key == "Enter") {
+					let selected = this.items.filter((item) => item.classList.contains("sf-selected"));
+					let href = this.parent.options.searchUrl.replace("%s", encodeURI(this.parent.input.value));
+					if (selected.length > 0) {
+						href = selected[0].querySelector("a").href;
+					}
+					if (href && href != "") {
 						if (callback) {
-							(window[callback] as any)(item, this);
+							(window[callback] as any)(selected.length ? selected[0] : null, this);
 						} else {
-							window.location.href = b;
+							window.location.href = href;
 						}
 						return false;
 					}
@@ -180,17 +187,31 @@ class SF {
 	moreElem: HTMLDivElement;
 	results: any[];
 
-	defaults = {
+	defaults: {
+		delay: number;
+		leftOffset: number;
+		topOffset: number;
+		text: string;
+		iwidth: number;
+		width: string;
+		ajaxUrl: string;
+		ajaxData?: {
+			[x: string]: any;
+		};
+		searchUrl: string;
+		callback: any;
+		rtl: boolean;
+		search: boolean;
+	} = {
 		delay: 500,
 		leftOffset: 0,
 		topOffset: 5,
 		text: "Search For",
 		iwidth: 180,
-		width: 315,
+		width: "315px",
 		ajaxUrl: "",
-		ajaxData: false, //function to extend data sent to server
+		ajaxData: null, //function to extend data sent to server
 		searchUrl: "",
-		expand: false,
 		callback: false,
 		rtl: false,
 		search: false,
@@ -210,6 +231,10 @@ class SF {
 		this.mainElem = document.createElement("div");
 		this.mainElem.classList.add("sf-container");
 
+		let userAgent = window.navigator.userAgent;
+		if (userAgent.indexOf("Win") != -1) {
+			this.mainElem.classList.add("sf-windows");
+		}
 		if (this.options.rtl) {
 			this.mainElem.classList.add("sf-rtl");
 		}
@@ -280,8 +305,11 @@ class SF {
 			data.append("action", "ajaxy_sf");
 			data.append("value", this.input.value);
 
-			if (this.options.ajaxData && window[this.options.ajaxData]) {
-				data = (window[this.options.ajaxData] as any)(data);
+			if (this.options.ajaxData) {
+				let keys = Object.keys(this.options.ajaxData);
+				keys.map((key) => {
+					data.append(key, this.options.ajaxData[key]);
+				});
 			}
 			if (this.options.search) {
 				let nResults = new SFResults(this.options.search, this);
@@ -302,10 +330,12 @@ class SF {
 								this.parseResults(results);
 							})
 							.catch((e) => {
+								console.error(e);
 								this.parseResults([]);
 							});
 					})
 					.catch((e) => {
+						console.error(e);
 						this.parseResults([]);
 					});
 			}
@@ -355,20 +385,19 @@ class SF {
 		}
 	}
 
-	loadEvents() {
-		document.addEventListener("click", () => {
-			this.mainElem.style.display = "none";
-		});
+	hide() {
+		this.mainElem && (this.mainElem.style.display = "none");
+	}
 
+	loadEvents() {
 		window.addEventListener("resize", () => {
 			if (this.mainElem.style.display == "none") {
 				return;
 			}
 			this.adjustPosition();
-		});		
-        
-        
-        window.addEventListener("scroll", () => {
+		});
+
+		window.addEventListener("scroll", () => {
 			if (this.mainElem.style.display == "none") {
 				return;
 			}
@@ -376,7 +405,14 @@ class SF {
 		});
 
 		this.input.addEventListener("keyup", (event) => {
-			if (event.key != "38" && event.key != "40" && event.key != "13" && event.key != "27" && event.key != "39" && event.key != "37") {
+			if (
+				event.key != "ArrowUp" &&
+				event.key != "ArrowDown" &&
+				event.key != "Enter" &&
+				event.key != "Escape" &&
+				event.key != "ArrowRight" &&
+				event.key != "ArrowLeft"
+			) {
 				if (this.timeout != null) {
 					clearTimeout(this.timeout);
 				}
@@ -389,30 +425,7 @@ class SF {
 			}
 		});
 
-		this.input.addEventListener("focus", () => {
-			this.input.classList.add("sf-focused");
-			if (this.options.expand > 0) {
-				animate(
-					this.input,
-					{
-						width: this.options.iwidth,
-					},
-					500
-				);
-			}
-		});
-		this.input.addEventListener("blur", () => {
-			this.input.classList.remove("sf-focused");
-			if (this.options.expand > 0) {
-				animate(
-					this.input,
-					{
-						width: this.options.expand,
-					},
-					500
-				);
-			}
-		});
+		document.addEventListener("click", this.hide.bind(this));
 	}
 }
 
@@ -424,8 +437,14 @@ let ready = (fn) => {
 	}
 };
 
+window.SFBoxes = {};
+
 ready(() => {
 	AjaxyLiveSearchSettings.boxes.map((box) => {
-		new SF(box.selector, box.options);
+		if (!window.SFBoxes[box.selector]) {
+			window.SFBoxes[box.selector] = new SF(box.selector, box.options);
+		}
 	});
 });
+
+window.SF = SF;

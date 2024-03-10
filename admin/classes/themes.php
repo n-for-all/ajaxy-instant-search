@@ -1,7 +1,7 @@
 <?php
 
 /**
- * List Table class.
+ * Themes table class.
  *
  * @package WordPress
  * @subpackage List_Table
@@ -11,7 +11,7 @@
 
 namespace Ajaxy\LiveSearch\Admin\Classes;
 
-class Themes_List_Table extends \WP_List_Table
+class Themes extends \WP_List_Table
 {
     public function __construct()
     {
@@ -110,8 +110,10 @@ class Themes_List_Table extends \WP_List_Table
     function single_row($field, $level = 0)
     {
         static $row_class = '';
+
+        /** @var \Ajaxy\LiveSearch\SF $AjaxyLiveSearch */
         global $AjaxyLiveSearch;
-        $theme = $AjaxyLiveSearch->get_style_setting('theme', false);
+        $theme = $AjaxyLiveSearch->get_styles()['theme'] ?? '';
         $add_class = ($field['title'] == $theme ? 'row-yes' : 'row-no');
         $row_class = ($row_class == '' ? ' class="alternate ' . $add_class . '"' : ' class="' . $add_class . '"');
 
@@ -126,6 +128,7 @@ class Themes_List_Table extends \WP_List_Table
     }
     function column_title($field)
     {
+        /** @var \Ajaxy\LiveSearch\SF $AjaxyLiveSearch */
         global $AjaxyLiveSearch;
         //$pad = str_repeat( '&#8212; ', max( 0, $this->level ) );
         $name =  $field['title'];
@@ -135,7 +138,8 @@ class Themes_List_Table extends \WP_List_Table
         $out = '<strong><a class="row-title" href="' . $edit_link . '" title="' . esc_attr(sprintf(__('Edit &#8220;%s&#8221;'), $name)) . '">' . $name . '</a></strong><br />';
 
         $actions = array();
-        $theme = $AjaxyLiveSearch->get_style_setting('theme', false);
+
+        $theme = $AjaxyLiveSearch->get_styles()['theme'] ?? '';
         if ($theme != $field['title']) :
             $actions['apply'] = "<a class='hide-field' href='" . $edit_link . "'>" . __('Apply theme') . "</a>";
         else :

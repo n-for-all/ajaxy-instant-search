@@ -23,6 +23,10 @@
     margin-right: 10px;
 }
 
+.sf-val li.sf-selected{
+    background-color: #f8f8f8;
+}
+
 .sf-container ::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.14);
     background-clip: padding-box;

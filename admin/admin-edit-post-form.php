@@ -11,6 +11,7 @@ $type = isset($_GET['type']) ? $_GET['type'] : exit();
 
 $post_type = get_post_type_object($_GET['name']);
 
+/** @var \Ajaxy\LiveSearch\SF $AjaxyLiveSearch */
 global $AjaxyLiveSearch;
 $message = false;
 if (!empty($post_type)) {
@@ -125,7 +126,7 @@ if (!empty($post_type)) {
                             </div>
                         </div>
                         <?php
-                        $excludes = (array)(isset($setting['excludes']) && sizeof($setting['excludes']) > 0 ? $setting['excludes'] : array());
+                        $excludes = (array)(isset($setting['excludes']) && sizeof((array)$setting['excludes']) > 0 ? $setting['excludes'] : array());
                         ?>
                         <div id="submitdiv" class="postbox ">
                             <div class="handlediv" title="<?php _e('Click to toggle'); ?>"><br></div>
@@ -177,32 +178,20 @@ if (!empty($post_type)) {
                             <h2><?php echo sprintf(_('"%s" Template'), $post_type->label); ?></h2>
                             <p><?php _e('Changes are live, use the tags below to customize the data replaced by each template.'); ?></p>
                             <?php wp_editor($AjaxyLiveSearch->get_templates($post_type->name, $type), 'sf_' . $post_type->name); ?>
-                            <table id="post-status-info" cellspacing="0">
-                                <tbody>
-                                    <tr>
-                                        <td><b><?php _e('Tags:'); ?></b>
-                                            <?php
-                                            if ($post_type->name != 'wpsc-product') {
-                                            ?>
-                                                {<?php echo implode("}, {", $allowed_tags); ?>}
-                                                <?php
-                                                if (in_array($post_type->name, Ajaxy\LiveSearch\SF::$woocommerce_post_types)) {
-                                                    $wootags = array('price_html', 'add_to_cart_button', 'sale_price', 'regular_price', 'price', 'price_including_tax', 'price_excluding_tax', 'price_suffix', 'price_html', 'price_html_from_text', 'average_rating', 'rating_count', 'rating_html', 'dimensions', 'shipping_class', 'add_to_cart_text', 'single_add_to_cart_text', 'add_to_cart_url', 'title');
-                                                ?>
-                                                    <br /><b><?php _e('WooCoomerce tags:'); ?></b> {<?php echo implode("}, {", $wootags); ?>}
-                                                <?php
-                                                }
-                                            } else {
-                                                ?>
-                                                {<?php echo implode("}, {", $allowed_tags); ?>}, {wpsc_price}, {wpsc_shipping}, {wpsc_image}
-                                            <?php
-                                            }
-                                            ?>
+                            <div class="ajaxy-editor-tags">
+                                <b><?php _e('Tags:'); ?></b>
+                                {<?php echo implode("}, {", $allowed_tags); ?>}
+                                
+                                <?php
+                                if (in_array($post_type->name, Ajaxy\LiveSearch\SF::$woocommerce_post_types)) {
+                                    $wootags = array('price_html', 'add_to_cart_button', 'sale_price', 'regular_price', 'price', 'price_including_tax', 'price_excluding_tax', 'price_suffix', 'price_html', 'price_html_from_text', 'average_rating', 'rating_count', 'rating_html', 'dimensions', 'shipping_class', 'add_to_cart_text', 'single_add_to_cart_text', 'add_to_cart_url', 'title');
+                                ?>
+                                    <br /><br/><b><?php _e('WooCoomerce tags:'); ?></b> {<?php echo implode("}, {", $wootags); ?>}
+                                <?php
+                                }
+                                ?>
 
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            </div>
                         </div>
                     </div>
                 </div>

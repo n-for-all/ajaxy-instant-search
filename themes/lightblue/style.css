@@ -83,13 +83,7 @@
 {	
 	background:#fff;
 }
-.sf-loadingsearch .sf-loadingbutton,.sf-loadingsearch  .searchsubmit
-{
-	background-image: url("images/sf_search.png") !important;
-	background-repeat: no-repeat !important;
-	background-position: 0px 0 !important;
-	background-color: white !important;
-}
+
 .sf-loading
 {
 	background-image: url("images/sf_loading.gif") !important;

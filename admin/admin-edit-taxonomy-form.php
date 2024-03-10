@@ -12,7 +12,7 @@ $taxonomy = false;
 
 $taxonomy = get_taxonomy($_GET['name']);
 
-
+/** @var \Ajaxy\LiveSearch\SF $AjaxyLiveSearch */
 global $AjaxyLiveSearch;
 $message = false;
 if (!empty($taxonomy)) {
