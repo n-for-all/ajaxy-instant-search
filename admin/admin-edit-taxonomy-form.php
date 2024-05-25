@@ -57,7 +57,6 @@ if (!empty($taxonomy)) {
 ?>
 
     <div class="wrap">
-        <?php screen_icon('post'); ?>
         <h2><?php echo esc_html($title); ?></h2>
         <?php if ($notice) : ?>
             <div id="notice" class="error">

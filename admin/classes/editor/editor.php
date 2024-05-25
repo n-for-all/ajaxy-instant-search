@@ -89,7 +89,7 @@ class Editor
 
         wp_add_inline_script(
             'ajaxy-blocks',
-            'var ajaxyBlocks = ' . json_encode(
+            'var ajaxyBlocks = ' . wp_json_encode(
                 array(
                     'widget' => array(
                         'post_types' => $json,

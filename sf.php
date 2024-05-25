@@ -8,9 +8,11 @@
 	Plugin URI: http://ajaxy.org
 	Description: Transfer wordpress form into an advanced ajax search form the same as facebook live search, This version supports themes and can work with almost all themes without any modifications
 	Version: 6.0.0
-	Author: Ajaxy Team
+	Author: Naji Amer (Ajaxy)
 	Author URI: http://www.ajaxy.org
 	License: GPLv2 or later
+    License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+    Requires PHP: 7.0
 */
 
 namespace Ajaxy\LiveSearch;
@@ -85,9 +87,6 @@ class SF
             add_filter('get_search_form', array(&$this, 'form_shortcode'), 1);
         }
         add_filter('ajaxy-overview', array(&$this, 'admin_page'), 10);
-
-        add_filter('sf_posts_query', array(&$this, 'posts_query'), 5, 10);
-        add_filter('sf_category_query', array(&$this, 'category_query'), 4, 10);
     }
     function shortcodes()
     {
@@ -242,7 +241,7 @@ class SF
                         </td>
                     </tr>
                 </table>
-            </div>*/?>
+            </div>*/ ?>
             <form id="ajaxy-form" action="" method="post">
                 <?php wp_nonce_field(); ?>
                 <?php if ($tab == 'post_type') : ?>
@@ -583,9 +582,9 @@ class SF
     function set_setting($name, $value)
     {
         if (get_option('sf_setting_' . $name) !== false) {
-            update_option('sf_setting_' . $name, json_encode($value));
+            update_option('sf_setting_' . $name, wp_json_encode($value));
         } else {
-            add_option('sf_setting_' . $name, json_encode($value));
+            add_option('sf_setting_' . $name, wp_json_encode($value));
         }
     }
     function remove_setting($name)
@@ -726,15 +725,14 @@ class SF
 				$wpdb->terms
 				, $wpdb->term_taxonomy
 			WHERE
-				name LIKE '%%%s%%'
-				AND $wpdb->term_taxonomy.taxonomy = '$taxonomy'
+				name LIKE %s
+				AND $wpdb->term_taxonomy.taxonomy = %s
 				AND $wpdb->term_taxonomy.term_id = $wpdb->terms.term_id
-			$excludes
+			%s
 			LIMIT 0, %d";
 
-        $query = apply_filters("sf_category_query", $wpdb->prepare($query,  $name, $setting->limit), $name, $excludes_array, $setting->limit);
-
-        $results = $wpdb->get_results($query);
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $results = $wpdb->get_results($wpdb->prepare($query, '%' . $wpdb->esc_like($name) . '%', $taxonomy, $excludes, $setting->limit));
 
         if (sizeof($results) > 0 && is_array($results) && !is_wp_error($results)) {
             foreach ($results as $result) {
@@ -790,14 +788,14 @@ class SF
 					FROM
 						$wpdb->usermeta
 					WHERE
-						(meta_key = 'first_name' AND meta_value LIKE '%%%s%%')
-						OR (meta_key = 'last_name' AND meta_value LIKE '%%%s%%' )
-						OR (meta_key = 'nickname' AND meta_value LIKE '%%%s%%' )
+						(meta_key = 'first_name' AND meta_value LIKE %s)
+						OR (meta_key = 'last_name' AND meta_value LIKE %s )
+						OR (meta_key = 'nickname' AND meta_value LIKE %s )
 				)
 		";
-        $query = apply_filters("sf_authors_query", $wpdb->prepare($query,  $name,  $name,  $name), $name);
-
-        $results = $wpdb->get_results($query);
+        $search = '%' . $wpdb->esc_like($name) . '%';
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $results = $wpdb->get_results($wpdb->prepare($query, $search, $search, $search));
 
         if (sizeof($results) > 0 && is_array($results) && !is_wp_error($results)) {
             foreach ($results as $result) {
@@ -864,15 +862,17 @@ class SF
 			FROM
 				$wpdb->posts
 			WHERE
-				(post_title LIKE '%%%s%%' " . ($setting->search_content == 1 ? "or post_content LIKE '%%%s%%')" : ")") . "
+				(post_title LIKE %s " . ($setting->search_content == 1 ? "or post_content LIKE %s)" : ")") . "
 				AND post_status='publish'
-				AND post_type='" . $post_type . "'
-				$excludes
-				$order_results
+				AND post_type = %s
+				%s
+				%s
 			LIMIT 0, %d";
-        $query = apply_filters("sf_posts_query", ($setting->search_content == 1 ? $wpdb->prepare($query, $name, $name, $setting->limit) : $wpdb->prepare($query, $name, $setting->limit)), $name, $post_type, $excludes_array, $setting->search_content, $order_results, $setting->limit);
 
-        $results = $wpdb->get_results($query);
+        $search = '%' . $wpdb->esc_like($name) . '%';
+
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $results = $wpdb->get_results($setting->search_content == 1 ? $wpdb->prepare($query, $search, $search, $post_type, $excludes, $order_results, $setting->limit) : $wpdb->prepare($query, $search, $post_type, $excludes, $order_results, $setting->limit));
 
 
         if (sizeof($results) > 0 && is_array($results) && !is_wp_error($results)) {
@@ -1048,7 +1048,7 @@ class SF
                 $post_object->post_content = $this->get_text_words(apply_filters('the_content', $post->post_content), (int)$styles['excerpt']);
             }
             if (in_array('{post_date_formatted}', $matches)) {
-                $post_object->post_date_formatted = date($date_format,  strtotime($post->post_date));
+                $post_object->post_date_formatted = gmdate($date_format,  strtotime($post->post_date));
             }
 
 
@@ -1076,7 +1076,7 @@ class SF
     }
     function get_text_words($text, $count)
     {
-        $tr = explode(' ', strip_tags(strip_shortcodes($text)));
+        $tr = explode(' ', \wp_strip_all_tags(strip_shortcodes($text)));
         $s = [];
         for ($i = 0; $i < $count && $i < sizeof($tr); $i++) {
             $s[] = $tr[$i];
@@ -1154,7 +1154,7 @@ class SF
         ?>
         <script type="text/javascript">
             /* <![CDATA[ */
-            var AjaxyLiveSearchSettings = <?php echo json_encode($settings); ?>;
+            var AjaxyLiveSearchSettings = <?php echo wp_json_encode($settings); ?>;
             /* ]]> */
         </script>
 <?php
@@ -1312,7 +1312,7 @@ class SF
                 }
             }
             $results = apply_filters('sf_results', $results);
-            echo json_encode($results);
+            echo wp_json_encode($results);
         }
         do_action('sf_value_results', $sf_value, $results);
         exit;
@@ -1452,48 +1452,10 @@ class SF
         $script = '
 		<script type="text/javascript">
 			/* <![CDATA[ */
-                var formSearch' . $m . ' = new SF("#' . $m . ' .sf-input", ' . json_encode($live_search_settings) . ');
+                var formSearch' . $m . ' = new SF("#' . $m . ' .sf-input", ' . wp_json_encode($live_search_settings) . ');
 			/* ]]> */
 		</script>';
         return $form . $script;
-    }
-
-
-    function category_query($query, $search, $excludes, $limit)
-    {
-        global $wpdb;
-        /** @disregard */
-        $wpml_lang_code = ($this->wpml && defined('ICL_LANGUAGE_CODE') ? ICL_LANGUAGE_CODE : false);
-        if ($wpml_lang_code) {
-            if (sizeof($excludes) > 0) {
-                $excludes = " AND $wpdb->terms.term_id NOT IN (" . implode(",", $excludes) . ")";
-            } else {
-                $excludes = "";
-            }
-
-            $query = "select * from (select distinct($wpdb->terms.name), $wpdb->terms.term_id,  $wpdb->term_taxonomy.taxonomy,  $wpdb->term_taxonomy.term_taxonomy_id from $wpdb->terms, $wpdb->term_taxonomy where name like '%%%s%%' and $wpdb->term_taxonomy.taxonomy<>'link_category' and $wpdb->term_taxonomy.term_id = $wpdb->terms.term_id $excludes limit 0, " . $limit . ") as c, " . $wpdb->prefix . "icl_translations as i where c.term_taxonomy_id = i.element_id and i.language_code = %s and SUBSTR(i.element_type, 1, 4)='tax_' group by c.term_id";
-            $query = $wpdb->prepare($query,  $search, $wpml_lang_code);
-            return $query;
-        }
-        return $query;
-    }
-
-    function posts_query($query, $search, $post_type, $excludes, $search_content, $order_results, $limit)
-    {
-        global $wpdb;
-        /** @disregard */
-        $wpml_lang_code = ($this->wpml && defined('ICL_LANGUAGE_CODE') ? ICL_LANGUAGE_CODE : false);
-        if ($wpml_lang_code) {
-            if (sizeof($excludes) > 0) {
-                $excludes = " AND $wpdb->posts.ID NOT IN (" . implode(",", $excludes) . ")";
-            } else {
-                $excludes = "";
-            }
-            //$order_results = (!empty($order_results) ? " order by ".$order_results : "");
-            $query = $wpdb->prepare("select * from (select $wpdb->posts.ID from $wpdb->posts where (post_title like '%%%s%%' " . ($search_content == true ? "or post_content like '%%%s%%')" : ")") . " and post_status='publish' and post_type='" . $post_type . "' $excludes $order_results limit 0," . $limit . ") as p, " . $wpdb->prefix . "icl_translations as i where p.ID = i.element_id and i.language_code = %s group by p.ID", ($search_content == true ? array($search, $search, $wpml_lang_code) : array($search, $wpml_lang_code)));
-            return $query;
-        }
-        return $query;
     }
 }
 function ajaxy_search_form($settings = array())
