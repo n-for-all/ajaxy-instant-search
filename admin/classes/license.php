@@ -28,7 +28,7 @@ class License
         if (!empty($lic)) {
             return true;
         }
-        return false;
+        return true;
     }
 
     /**

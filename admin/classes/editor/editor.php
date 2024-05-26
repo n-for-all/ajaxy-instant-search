@@ -115,7 +115,7 @@ class Editor
             'widget' => [
                 'attributes' => $widgetData['attributes'],
                 'template' => 'widget',
-                'title' => 'Ajaxy Live Search',
+                'title' => 'Ajaxy Instant Search',
             ]
         ];
         

@@ -3,7 +3,7 @@
 return array(
     'apiVersion' => 2,
     'name' => 'ajaxy-blocks/widget',
-    'title' => 'Ajaxy Live Search Widget',
+    'title' => 'Ajaxy Instant Search Widget',
     'category' => 'ajaxy-blocks',
     'description' => 'Live search',
     'keywords' =>

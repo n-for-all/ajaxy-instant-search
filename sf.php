@@ -4,12 +4,12 @@
  * @package Ajaxy
  */
 /*
-	Plugin Name: Ajaxy Live Search
-	Plugin URI: http://ajaxy.org
+	Plugin Name: Ajaxy Instant Search
+	Plugin URI: https://www.ajaxy.org/ajaxy-live-search-plugin
 	Description: Transfer wordpress form into an advanced ajax search form the same as facebook live search, This version supports themes and can work with almost all themes without any modifications
-	Version: 6.0.1
+	Version: 6.0.2
 	Author: Naji Amer (Ajaxy)
-	Author URI: http://www.ajaxy.org
+	Author URI: https://www.ajaxy.org
 	License: GPLv2 or later
     License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
     Requires PHP: 7.0
@@ -19,7 +19,7 @@ namespace Ajaxy\LiveSearch;
 
 
 define("AJAXY_SF_PLUGIN_TEXT_DOMAIN", "ajaxy-sf");
-define('AJAXY_SF_VERSION', '6.0.1');
+define('AJAXY_SF_VERSION', '6.0.2');
 define('AJAXY_SF_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('AJAXY_THEMES_DIR', dirname(__FILE__) . "/themes/");
 define('AJAXY_SF_NO_IMAGE', plugin_dir_url(__FILE__) . "themes/default/images/no-image.gif");
@@ -214,7 +214,7 @@ class SF
         </style>
         <div class="wrap">
             <div id="icon-edit" class="icon32 icon32-posts-post"><br></div>
-            <h2><?php _e('Ajaxy Live Search'); ?></h2>
+            <h2><?php _e('Ajaxy Instant Search'); ?></h2>
             <nav class="nav-tab-wrapper">
                 <a href="<?php echo menu_page_url('ajaxy_sf_admin', false); ?>" class="nav-tab <?php echo (!$tab ? 'nav-tab-active' : ''); ?>"><?php _e('General settings'); ?><span class="count"></span></a>
                 <a href="<?php echo menu_page_url('ajaxy_sf_admin', false) . '&tab=post_type'; ?>" class="nav-tab <?php echo ($tab == 'post_type' ? 'nav-tab-active' : ''); ?>"><?php _e('Post type'); ?><span class="count"></span></a>
@@ -224,7 +224,7 @@ class SF
                 <a href="<?php echo menu_page_url('ajaxy_sf_admin', false) . '&tab=themes'; ?>" class="nav-tab <?php echo ($tab == 'themes' ? 'nav-tab-active' : ''); ?>"><?php _e('Themes'); ?><span class="count"></span></a>
                 <a href="<?php echo menu_page_url('ajaxy_sf_admin', false) . '&tab=shortcode'; ?>" class="nav-tab <?php echo ($tab == 'shortcode' ? 'nav-tab-active' : ''); ?>"><?php _e('Shortcodes'); ?><span class="count"></span></a>
                 <a href="<?php echo menu_page_url('ajaxy_sf_admin', false) . '&tab=preview'; ?>" class="nav-tab <?php echo ($tab == 'preview' ? 'nav-tab-active' : ''); ?>"><?php _e('Preview'); ?><span class="count"></span></a>
-                <a href="<?php echo menu_page_url('ajaxy_sf_admin', false) . '&tab=license'; ?>" class="nav-tab <?php echo ($tab == 'license' ? 'nav-tab-active' : ''); ?>"><?php _e('License'); ?><span class="count"></span></a>
+                <!-- <a href="<?php echo menu_page_url('ajaxy_sf_admin', false) . '&tab=license'; ?>" class="nav-tab <?php echo ($tab == 'license' ? 'nav-tab-active' : ''); ?>"><?php _e('License'); ?><span class="count"></span></a> -->
             </nav>
 
             <?php /*<div id="message-bottom" class="updated">
@@ -593,9 +593,13 @@ class SF
     }
     function get_setting($name, $public = true)
     {
+        $show = 0;
+        if(\in_array($name, ['category', 'post', 'page', 'product'])){
+            $show = 1;
+        }
         $defaults = array(
             'title' => '',
-            'show' => 0,
+            'show' => $show,
             'ushow' => 0,
             'search_content' => 0,
             'limit' => 5,
@@ -847,10 +851,8 @@ class SF
         $posts = array();
         $setting = (object)$this->get_setting($post_type);
         $excludes = "";
-        $excludes_array = array();
         if (isset($setting->excludes) && is_array($setting->excludes) && sizeof($setting->excludes) > 0) {
             $excludes = " AND ID NOT IN (" . implode(',', $setting->excludes) . ")";
-            $excludes_array = $setting->excludes;
         }
 
         $order_results = ($setting->order_results ? " ORDER BY " . $setting->order_results : "");
@@ -1244,7 +1246,6 @@ class SF
             }
             echo '[ajaxy-live-search ' . implode(' ', $m) . ']';
         }
-        //print_r($_POST);
         exit;
     }
     function get_search_results()

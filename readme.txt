@@ -1,4 +1,4 @@
-=== Ajaxy Live Search ===
+=== Ajaxy Instant Search ===
 Contributors: n-for-all
 Donate link: http://ajaxy.org/
 Version: 6.0.0

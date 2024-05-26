@@ -220,7 +220,7 @@ class SF {
 	constructor(selector: string, options) {
 		this.input = document.querySelector(selector);
 		if (!this.input) {
-			console.warn(`Ajaxy Live Search can't find input ${selector}`);
+			console.warn(`Ajaxy Instant Search can't find input ${selector}`);
 			return;
 		}
 		this.timeout = null;

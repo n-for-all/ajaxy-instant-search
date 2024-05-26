@@ -1,7 +1,7 @@
 {
 	"apiVersion": 2,
 	"name": "ajaxy-blocks/widget",
-	"title": "Ajaxy Live Search",
+	"title": "Ajaxy Instant Search",
 	"category": "ajaxy-blocks",
 	"description": "Live search",
 	"keywords": ["live", "search"],
