@@ -1385,8 +1385,8 @@ class SF
             $settings['id'],
             home_url('/'),
             __('Search for:', AJAXY_SF_PLUGIN_TEXT_DOMAIN),
-            $settings['border'],
-            $settings['iwidth'],
+            $settings['border'] ?? '',
+            $settings['iwidth'] ?? '',
             get_search_query(),
             $settings['label'],
             esc_attr__(__('Search', AJAXY_SF_PLUGIN_TEXT_DOMAIN))
