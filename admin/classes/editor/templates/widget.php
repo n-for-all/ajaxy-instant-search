@@ -9,6 +9,8 @@
  * )
  */
 
+if (!defined('ABSPATH')) exit;
+
 $classes = [];
 $column_content_classes = array();
 

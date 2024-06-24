@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('ABSPATH')) exit;
+
 /** @var \Ajaxy\LiveSearch\SF $AjaxyLiveSearch */
 global $AjaxyLiveSearch;
 
@@ -21,29 +23,29 @@ $styles = $AjaxyLiveSearch->get_styles(
 );
 ?>
 <div class="ajaxy-wrap">
-    <h2><?php _e('Select the search settings below and click generate shortcode.'); ?></h2>
+    <h2><?php esc_html_e('Select the search settings below and click generate shortcode.', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></h2>
     <div class="ajaxy-form-left">
-        <h3><?php _e('Search Settings'); ?></h3>
+        <h3><?php esc_html_e('Search Settings', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></h3>
         <div>
             <input type="hidden" name="action" value="ajaxy_sf_shortcode" />
             <table class="form-table">
                 <tbody>
                     <tr valign="top">
-                        <th scope="row"><label><?php _e('Show Categories'); ?></label></th>
+                        <th scope="row"><label><?php esc_html_e('Show Categories', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></label></th>
                         <td>
                             <input type="checkbox" name="sf[style][show_category]" checked="checked" value="1" />
-                            <span class="description"><?php _e('Show the categories in the search results.'); ?></span>
+                            <span class="description"><?php esc_html_e('Show the categories in the search results.', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></span>
                         </td>
                     </tr>
                     <tr valign="top">
-                        <th scope="row"><label><?php _e('Show Post Categories'); ?></label></th>
+                        <th scope="row"><label><?php esc_html_e('Show Post Categories', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></label></th>
                         <td>
                             <input type="checkbox" name="sf[style][show_post_category]" checked="checked" value="1" />
-                            <span class="description"><?php _e('Show post of found categories in the search results.'); ?></span>
+                            <span class="description"><?php esc_html_e('Show post of found categories in the search results.', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></span>
                         </td>
                     </tr>
                     <tr valign="top">
-                        <th scope="row"><label><?php _e('Post types'); ?></label></th>
+                        <th scope="row"><label><?php esc_html_e('Post types', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></label></th>
                         <td>
                             <ul class="ajaxy-sf-select">
                                 <?php
@@ -55,113 +57,113 @@ $styles = $AjaxyLiveSearch->get_styles(
                                 }
                                 ?>
                             </ul>
-                            <span class="description"><?php _e('Select which post types to search, don\'t select any if you want to search all.'); ?></span>
+                            <span class="description"><?php esc_html_e('Select which post types to search, don\'t select any if you want to search all.', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></span>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        <h3><?php _e('Search Form Box'); ?></h3>
+        <h3><?php esc_html_e('Search Form Box', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></h3>
         <div>
             <table class="form-table">
                 <tbody>
                     <tr valign="top">
-                        <th scope="row"><label><?php _e('Use Right to Left styles'); ?></label></th>
+                        <th scope="row"><label><?php esc_html_e('Use Right to Left styles', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></label></th>
                         <td>
-                            <input type="checkbox" name="sf[style][rtl]" <?php echo $styles['rtl_theme'] > 0 ? 'checked="checked"' : ''; ?> value="1" />
-                            <span class="description"><?php _e('Check this in case you want to use rtl themes to support right to left languages like arabic.'); ?></span>
+                            <input type="checkbox" name="sf[style][rtl]" <?php checked($styles['rtl_theme'] > 0, true); ?> value="1" />
+                            <span class="description"><?php esc_html_e('Check this in case you want to use rtl themes to support right to left languages like arabic.', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></span>
                         </td>
                     </tr>
                     <tr valign="top">
-                        <th scope="row"><label><?php _e('Search label'); ?></label></th>
+                        <th scope="row"><label><?php esc_html_e('Search label', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></label></th>
                         <td>
-                            <input type="text" value="<?php echo $styles['search_label']; ?>" name="sf[style][label]" class="regular-text">
-                            <p class="description"><?php _e('This label appears inside the search form and will be hidden when the user clicks inside.'); ?></p>
+                            <input type="text" value="<?php echo esc_attr($styles['search_label']); ?>" name="sf[style][label]" class="regular-text">
+                            <p class="description"><?php esc_html_e('This label appears inside the search form and will be hidden when the user clicks inside.', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></p>
                         </td>
                     </tr>
                     <tr valign="top">
-                        <th scope="row"><label><?php _e('Width'); ?></label></th>
+                        <th scope="row"><label><?php esc_html_e('Width', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></label></th>
                         <td>
-                            <input style="width:40px" type="text" value="<?php echo $styles['width']; ?>" name="sf[style][width]" class="regular-text">
-                            <p class="description"><?php _e('The width of the search form (width is per pixel) - the value should be integer.'); ?></p>
+                            <input style="width:40px" type="text" value="<?php echo esc_attr($styles['width']); ?>" name="sf[style][width]" class="regular-text">
+                            <p class="description"><?php esc_html_e('The width of the search form (width is per pixel) - the value should be integer.', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></p>
                         </td>
                     </tr>
                     <tr valign="top">
-                        <th scope="row"><label><?php _e('Delay time'); ?></label></th>
+                        <th scope="row"><label><?php esc_html_e('Delay time', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></label></th>
                         <td>
-                            <input style="width:40px" type="text" value="<?php echo $styles['delay']; ?>" name="sf[style][delay]" class="regular-text">
-                            <p class="description"><?php _e('The delay time before showing the results (this will allow the user to input more text before searching) -  <b>(in millisecond, i.e 5000 = 5sec)</b>.'); ?></p>
+                            <input style="width:40px" type="text" value="<?php echo esc_attr($styles['delay']); ?>" name="sf[style][delay]" class="regular-text">
+                            <p class="description"><?php esc_html_e('The delay time before showing the results (this will allow the user to input more text before searching) -  <b>(in millisecond, i.e 5000 = 5sec)</b>.', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></p>
                         </td>
                     </tr>
                     <tr valign="top">
-                        <th scope="row"><label><?php _e('Border width'); ?></label></th>
+                        <th scope="row"><label><?php esc_html_e('Border width', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></label></th>
                         <td>
-                            <input style="width:40px" type="text" value="<?php echo $styles['border-width']; ?>" name="sf[style][b_width]" class="regular-text">
-                            <p class="description"><?php _e('The width of the search form border.'); ?></p>
+                            <input style="width:40px" type="text" value="<?php echo esc_attr($styles['border-width']); ?>" name="sf[style][b_width]" class="regular-text">
+                            <p class="description"><?php esc_html_e('The width of the search form border.', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></p>
                         </td>
                     </tr>
                     <tr valign="top">
-                        <th scope="row"><label><?php _e('Border type'); ?></label></th>
+                        <th scope="row"><label><?php esc_html_e('Border type', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></label></th>
                         <td>
                             <select name="sf[style][b_type]">
-                                <option value="solid" <?php echo ($values['border-type'] == 'solid' ? 'selected="selected"' : ""); ?>><?php _e('solid'); ?></option>
-                                <option value="dotted" <?php echo ($values['border-type'] == 'dotted' ? 'selected="selected"' : ""); ?>><?php _e('dotted'); ?></option>
-                                <option value="dashed" <?php echo ($values['border-type'] == 'dashed' ? 'selected="selected"' : ""); ?>><?php _e('dashed'); ?></option>
+                                <option value="solid" <?php selected($values['border-type'], 'solid'); ?>><?php esc_html_e('solid', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></option>
+                                <option value="dotted" <?php selected($values['border-type'], 'dotted'); ?>><?php esc_html_e('dotted', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></option>
+                                <option value="dashed" <?php selected($values['border-type'], 'dashed'); ?>><?php esc_html_e('dashed', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></option>
                             </select>
-                            <p class="description"><?php _e('The type of the search form border.'); ?></p>
+                            <p class="description"><?php esc_html_e('The type of the search form border.', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></p>
                         </td>
                     </tr>
                     <tr valign="top">
-                        <th scope="row"><label><?php _e('Border color'); ?></label></th>
+                        <th scope="row"><label><?php esc_html_e('Border color', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></label></th>
                         <td>
-                            <input style="width:52px" type="text" value="<?php echo $values['border-color']; ?>" name="sf[style][b_color]" class="regular-text">
-                            <p class="description"><?php _e('The color of the search form border (color value is hexa-decimal).'); ?></p>
+                            <input style="width:52px" type="text" value="<?php echo esc_attr($values['border-color']); ?>" name="sf[style][b_color]" class="regular-text">
+                            <p class="description"><?php esc_html_e('The color of the search form border (color value is hexa-decimal).', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></p>
                         </td>
                     </tr>
 
                 </tbody>
             </table>
         </div>
-        <h3><?php _e('Search Results box'); ?></h3>
+        <h3><?php esc_html_e('Search Results box', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></h3>
         <div>
             <table class="form-table">
                 <tbody>
                     <tr valign="top">
-                        <th scope="row"><label><?php _e('Width'); ?></label></th>
+                        <th scope="row"><label><?php esc_html_e('Width', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></label></th>
                         <td>
-                            <input style="width:40px" type="text" value="<?php echo $styles['results_width']; ?>" name="sf[style][results_width]" class="regular-text">
+                            <input style="width:40px" type="text" value="<?php echo esc_attr($styles['results_width']); ?>" name="sf[style][results_width]" class="regular-text">
                             <select name="sf[style][results_width_unit]">
-                                <option value="px" <?php echo ($styles['results_width_unit'] == 'px' ? 'selected="selected"' : ""); ?>><?php _e('Pixels'); ?></option>
-                                <option value="%" <?php echo ($styles['results_width_unit'] == '%' ? 'selected="selected"' : ""); ?>><?php _e('Percent'); ?></option>
+                                <option value="px" <?php selected($styles['results_width_unit'], 'px'); ?>><?php esc_html_e('Pixels', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></option>
+                                <option value="%" <?php selected($styles['results_width_unit'], '%'); ?>><?php esc_html_e('Percent', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></option>
                             </select>
-                            <p class="description"><?php _e('The width of the results box (width is per pixel) - the value should be integer.'); ?></p>
+                            <p class="description"><?php esc_html_e('The width of the results box (width is per pixel) - the value should be integer.', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></p>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        <h3><?php _e('More results box'); ?></h3>
+        <h3><?php esc_html_e('More results box', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></h3>
         <div>
             <table class="form-table">
                 <tbody>
                     <tr valign="top">
-                        <th scope="row"><label><?php _e('Search Url'); ?></label></th>
+                        <th scope="row"><label><?php esc_html_e('Search Url', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></label></th>
                         <td>
-                            <input type="text" value="<?php echo $styles['search_url']; ?>" name="sf[style][url]" class="regular-text">
-                            <p class="description"><?php _e('This search URL for the "See more results"'); ?></p>
+                            <input type="text" value="<?php echo esc_attr($styles['search_url']); ?>" name="sf[style][url]" class="regular-text">
+                            <p class="description"><?php esc_html_e('This search URL for the "See more results"', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></p>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        <h3><?php _e('Credits'); ?></h3>
+        <h3><?php esc_html_e('Credits', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></h3>
         <div>
             <table class="form-table">
                 <tbody>
                     <tr valign="top">
                         <td colspan="2">
-                            <input type="checkbox" name="sf[style][credits]" <?php echo $styles['credits'] == 1 ? 'checked="checked"' : ''; ?> value="1" />
-                            <span class="description"><?php _e('Author "Powered by" link and credits.'); ?></span>
+                            <input type="checkbox" name="sf[style][credits]" <?php checked($styles['credits'], 1); ?> value="1" />
+                            <span class="description"><?php esc_html_e('Author "Powered by" link and credits.', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></span>
                         </td>
                     </tr>
                 </tbody>
@@ -170,47 +172,23 @@ $styles = $AjaxyLiveSearch->get_styles(
     </div>
 
     <div class="ajaxy-form-right">
-        <h3><?php _e('Shortcode'); ?></h3>
+        <h3><?php esc_html_e('Shortcode', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></h3>
         <div>
             <table class="form-table">
                 <tbody>
                     <tr valign="top">
                         <td scope="row">
-                            <button class="button-primary" name="sf_submit" type="submit"><?php _e('Generate shortcode'); ?></button>
+                            <button class="button-primary" name="sf_submit" type="submit"><?php esc_html_e('Generate shortcode', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></button>
                         </td>
                     </tr>
                     <tr valign="top">
                         <td>
                             <textarea id="shortcode-text" style="width:99%;min-height:150px"></textarea>
-                            <span class="description"><?php _e('Copy the shortcode to where you want it to appear.'); ?></span>
+                            <span class="description"><?php esc_html_e('Copy the shortcode to where you want it to appear.', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></span>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
-    <script type="text/javascript">
-        jQuery(document).ready(function() {
-            jQuery("#ajaxy-form").submit(function(e) {
-                var postData = jQuery(this).serializeArray();
-                jQuery.ajax({
-                    url: ajaxurl,
-                    type: "POST",
-                    data: postData,
-                    success: function(data, textStatus, jqXHR) {
-                        jQuery('#shortcode-text').val(data);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        //if fails      
-                    }
-                });
-                e.preventDefault(); //STOP default action
-                //e.unbind(); //unbind. to stop multiple form submit.
-                return false;
-            });
-            jQuery("#shortcode-text").dblclick(function() {
-                jQuery(this).select();
-            });
-        });
-    </script>
 </div>

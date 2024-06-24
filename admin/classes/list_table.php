@@ -11,6 +11,8 @@
 
 namespace Ajaxy\LiveSearch\Admin\Classes;
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 class List_Table extends \WP_List_Table
 {
 
@@ -63,8 +65,8 @@ class List_Table extends \WP_List_Table
     function get_bulk_actions()
     {
         $actions = array();
-        $actions['hide'] = __('Hide from results');
-        $actions['show'] = __('Show in results');
+        $actions['hide'] = __('Hide from results', AJAXY_SF_PLUGIN_TEXT_DOMAIN);
+        $actions['show'] = __('Show in results', AJAXY_SF_PLUGIN_TEXT_DOMAIN);
 
         return $actions;
     }
@@ -81,12 +83,12 @@ class List_Table extends \WP_List_Table
     {
         $columns = array(
             'cb'          => '<input type="checkbox" />',
-            'title'        => __('Title'),
-            'type'    => __('Type'),
-            'search_setting' => __('Search setting'),
-            'show_on_search' => __('Search'),
-            'limit_results' => __('Limit'),
-            'order'            => __('Order')
+            'title'        => __('Title', AJAXY_SF_PLUGIN_TEXT_DOMAIN),
+            'type'    => __('Type', AJAXY_SF_PLUGIN_TEXT_DOMAIN),
+            'search_setting' => __('Search setting', AJAXY_SF_PLUGIN_TEXT_DOMAIN),
+            'show_on_search' => __('Search', AJAXY_SF_PLUGIN_TEXT_DOMAIN),
+            'limit_results' => __('Limit', AJAXY_SF_PLUGIN_TEXT_DOMAIN),
+            'order'            => __('Order', AJAXY_SF_PLUGIN_TEXT_DOMAIN)
         );
 
         return $columns;
@@ -203,13 +205,13 @@ class List_Table extends \WP_List_Table
 
         $actions = array();
 
-        $actions['edit'] = '<a href="' . $edit_link . '">' . __('Edit template & Settings') . '</a>';
+        $actions['edit'] = '<a href="' . $edit_link . '">' . esc_html_e('Edit template & Settings', AJAXY_SF_PLUGIN_TEXT_DOMAIN) . '</a>';
 
         $setting = (array)$AjaxyLiveSearch->get_setting($this->setting_prefix . $field['name'], $this->public);
         if ($setting['show'] == 1) :
-            $actions['hide'] = "<a class='hide-field' href='" . wp_nonce_url(menu_page_url('ajaxy_sf_admin', false) . '&amp;name=' . $field['name'] . '&amp;type=' . $field['type'] . '&amp;show=0&amp;tab=' . $_GET['tab'], 'hide-post_type_' . $field['name']) . "'>" . __('Hide from results') . "</a>";
+            $actions['hide'] = "<a class='hide-field' href='" . wp_nonce_url(menu_page_url('ajaxy_sf_admin', false) . '&amp;name=' . $field['name'] . '&amp;type=' . $field['type'] . '&amp;show=0&amp;tab=' . $_GET['tab'], 'hide-post_type_' . $field['name']) . "'>" . esc_html_e('Hide from results', AJAXY_SF_PLUGIN_TEXT_DOMAIN) . "</a>";
         else :
-            $actions['show'] = "<a class='show-field' href='" . wp_nonce_url(menu_page_url('ajaxy_sf_admin', false) . '&amp;name=' . $field['name'] . '&amp;type=' . $field['type'] . '&amp;show=1&amp;tab=' . $_GET['tab'], 'show-post_type_' . $field['name']) . "'>" . __('show in results') . "</a>";
+            $actions['show'] = "<a class='show-field' href='" . wp_nonce_url(menu_page_url('ajaxy_sf_admin', false) . '&amp;name=' . $field['name'] . '&amp;type=' . $field['type'] . '&amp;show=1&amp;tab=' . $_GET['tab'], 'show-post_type_' . $field['name']) . "'>" . esc_html_e('show in results', AJAXY_SF_PLUGIN_TEXT_DOMAIN) . "</a>";
         endif;
         $out .= $this->row_actions($actions);
         $out .= '<div class="hidden" id="inline_' . $field['name'] . '">';

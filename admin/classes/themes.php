@@ -11,6 +11,8 @@
 
 namespace Ajaxy\LiveSearch\Admin\Classes;
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 class Themes extends \WP_List_Table
 {
     public function __construct()
@@ -29,7 +31,6 @@ class Themes extends \WP_List_Table
     function get_bulk_actions()
     {
         $actions = array();
-        //$actions['apply'] = __( 'Apply theme' );
 
         return $actions;
     }
@@ -45,9 +46,9 @@ class Themes extends \WP_List_Table
     function get_columns()
     {
         $columns = array(
-            'title'    => __('Theme'),
-            'directory'        => __('Directory'),
-            'stylesheet_url'        => __('Stylesheet URL')
+            'title'    => __('Theme', AJAXY_SF_PLUGIN_TEXT_DOMAIN),
+            'directory'        => __('Directory', AJAXY_SF_PLUGIN_TEXT_DOMAIN),
+            'stylesheet_url'        => __('Stylesheet URL', AJAXY_SF_PLUGIN_TEXT_DOMAIN)
         );
 
         return $columns;
@@ -135,15 +136,15 @@ class Themes extends \WP_List_Table
 
         $edit_link = menu_page_url('ajaxy_sf_admin', false) . '&tab=themes&theme=' . $field['title'] . '&apply=1';
         $edit_link = wp_nonce_url($edit_link, 'hide-post_type_' . $field['title']);
-        $out = '<strong><a class="row-title" href="' . $edit_link . '" title="' . esc_attr(sprintf(__('Edit &#8220;%s&#8221;'), $name)) . '">' . $name . '</a></strong><br />';
+        $out = '<strong><a class="row-title" href="' . $edit_link . '" title="' . esc_attr(sprintf(esc_html__('Edit &#8220;%s&#8221;'), $name)) . '">' . $name . '</a></strong><br />';
 
         $actions = array();
 
-        $theme = $AjaxyLiveSearch->get_styles()['theme'] ?? '';
+        $theme = $AjaxyLiveSearch->get_styles()['theme'] ?? 'default';
         if ($theme != $field['title']) :
-            $actions['apply'] = "<a class='hide-field' href='" . $edit_link . "'>" . __('Apply theme') . "</a>";
+            $actions['apply'] = "<a class='hide-field' href='" . $edit_link . "'>" . esc_html__('Apply theme', AJAXY_SF_PLUGIN_TEXT_DOMAIN) . "</a>";
         else :
-            $actions['apply'] =  __('Current theme');
+            $actions['apply'] =  esc_html__('Current theme', AJAXY_SF_PLUGIN_TEXT_DOMAIN);
         endif;
         $out .= $this->row_actions($actions);
         $out .= '<div class="hidden" id="inline_' . $field['title'] . '">';

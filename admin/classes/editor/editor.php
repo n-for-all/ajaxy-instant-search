@@ -2,6 +2,8 @@
 
 namespace Ajaxy\LiveSearch\Admin\Classes\Editor;
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 class Editor
 {
 

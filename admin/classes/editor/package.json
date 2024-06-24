@@ -5,9 +5,10 @@
 	"main": "index.js",
 	"author": "Naji Amer",
 	"scripts": {
-		"build": "export NODE_OPTIONS=--openssl-legacy-provider & wp-scripts build ./src/editor.js --output-path=../../../admin/js/ & node-sass --include-path node_modules -rw src/sass/editor.scss -o ../../../admin/css & node-sass --include-path node_modules -rw src/sass/styles.scss -o ../../assets/css/blocks",
-		"dev:watch": "export NODE_OPTIONS=--openssl-legacy-provider & wp-scripts start ./src/editor.js --output-path=../../../admin/js/ & node-sass --include-path node_modules -rw src/sass/editor.scss -o ../../../admin/css & node-sass --include-path node_modules -rw src/sass/styles.scss -o ../../assets/css/blocks",
-		"sass:watch": "export NODE_OPTIONS=--openssl-legacy-provider node-sass --include-path node_modules -rw src/sass/editor.scss -o ../../../admin/css & node-sass --include-path node_modules -rw src/sass/styles.scss -o ../../assets/css/blocks"
+		"build": "wp-scripts build ./src/editor.js --output-path=../../../admin/js/ & sass -I node_modules src/sass/editor.scss:../../../admin/css/editor.css src/sass/styles.scss:../../../admin/css/styles.css --no-source-map",
+		"dev:watch": "wp-scripts start ./src/editor.js --output-path=../../../admin/js/ & sass -I node_modules -w src/sass/editor.scss:../../../admin/css/editor.css src/sass/styles.scss:../../../admin/css/styles.css",
+		"sass:watch": "sass -I node_modules -w src/sass/editor.scss:../../../admin/css/editor.css src/sass/styles.scss:../../../admin/css/styles.css",
+		"sass:build": "sass -I node_modules -w src/sass/editor.scss:../../../admin/css/editor.css src/sass/styles.scss:../../../admin/css/styles.css --no-source-map"
 	},
 	"devDependencies": {
 		"@types/react": "^18.2.64",
@@ -18,7 +19,8 @@
 		"@wordpress/scripts": "^17.1.0",
 		"classnames": "^2.3.1",
 		"lodash": "^4.17.21",
-		"node-gyp": "^8.1.0"
+		"node-gyp": "^8.1.0",
+		"sass": "^1.77.6"
 	},
 	"dependencies": {
 		"@wordpress/block-editor": "^12.21.0",

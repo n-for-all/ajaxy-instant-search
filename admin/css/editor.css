@@ -80,13 +80,16 @@
  * Breakpoints & Media Queries
  */
 [data-type="ajaxy-blocks/widget"] {
-  position: relative; }
-  [data-type="ajaxy-blocks/widget"] .wp-block-widget-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    background-color: #fff;
-    padding: 1rem;
-    transform: translate(-50%, -50%); }
-  [data-type="ajaxy-blocks/widget"] .wp-block-widget-image {
-    min-height: 250px; }
+  position: relative;
+}
+[data-type="ajaxy-blocks/widget"] .wp-block-widget-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background-color: #fff;
+  padding: 1rem;
+  transform: translate(-50%, -50%);
+}
+[data-type="ajaxy-blocks/widget"] .wp-block-widget-image {
+  min-height: 250px;
+}

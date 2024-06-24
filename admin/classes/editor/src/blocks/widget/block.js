@@ -22,7 +22,7 @@ export const settings = {
 	example: {
 		attributes: {
 			mediaType: "image",
-			mediaUrl: "https://s.w.org/images/core/5.3/Biologia_Centrali-Americana_-_Cantorchilus_semibadius_1902.jpg",
+			mediaUrl: "../img/editor.jpg",
 		}
 	},
 	edit,

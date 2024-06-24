@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 return array(
     'apiVersion' => 2,
     'name' => 'ajaxy-blocks/widget',

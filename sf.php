@@ -30,7 +30,6 @@ class SF
     public static $woocommerce_post_types = array('product', 'shop_order', 'shop_coupon');
 
     private $wpml = false;
-    private $license = false;
 
     private $default_templates = [
         'post' => '<a href="%s">%s<span class="sf-content"><span class="sf-text">%s</span><span class="sf-small">%s</span></span></a>'
@@ -47,18 +46,14 @@ class SF
         $this->actions();
         $this->filters();
         $this->shortcodes();
-
-        $this->license = new Admin\Classes\License();
     }
     function actions()
     {
 
         add_action('wp_enqueue_scripts', array(&$this, "enqueue_scripts"));
-        add_action('admin_enqueue_scripts', array(&$this, "enqueue_scripts"));
+        add_action('admin_enqueue_scripts', array(&$this, "admin_enqueue_scripts"));
 
         add_action("admin_menu", array(&$this, "menu_pages"));
-        add_action('wp_head', array(&$this, 'head'));
-        add_action('admin_head', array(&$this, 'head'));
         add_action('wp_footer', array(&$this, 'footer'));
         add_action('admin_footer', array(&$this, 'footer'));
 
@@ -102,16 +97,6 @@ class SF
         load_plugin_textdomain(AJAXY_SF_PLUGIN_TEXT_DOMAIN, false, plugin_basename(__DIR__) . '/langs');
     }
 
-    function is_licensed()
-    {
-        return $this->license->is_licensed();
-    }
-
-    function activate_license($license_key)
-    {
-        return $this->license->active($license_key);
-    }
-
     function menu_page_exists($menu_slug)
     {
         global $menu;
@@ -126,9 +111,9 @@ class SF
     function menu_pages()
     {
         if (!$this->menu_page_exists('ajaxy-page')) {
-            add_menu_page(_n('Ajaxy', 'Ajaxy', 1, 'ajaxy'), _n('Ajaxy', 'Ajaxy', 1), 'Ajaxy', 'ajaxy-page', array(&$this, 'overview'), AJAXY_SF_PLUGIN_URL . '/images/ico.svg');
+            add_menu_page(_n('Ajaxy', 'Ajaxy', 1, AJAXY_SF_PLUGIN_TEXT_DOMAIN), _n('Ajaxy', 'Ajaxy', 1, AJAXY_SF_PLUGIN_TEXT_DOMAIN), 'Ajaxy', 'ajaxy-page', array(&$this, 'overview'), AJAXY_SF_PLUGIN_URL . '/images/ico.svg');
         }
-        add_submenu_page('ajaxy-page', __('Live Search', AJAXY_SF_PLUGIN_TEXT_DOMAIN), __('Live Search', AJAXY_SF_PLUGIN_TEXT_DOMAIN), 'manage_options', 'ajaxy_sf_admin', array(&$this, 'admin_page'));
+        add_submenu_page('ajaxy-page', __('Instant Search', AJAXY_SF_PLUGIN_TEXT_DOMAIN), __('Instant Search', AJAXY_SF_PLUGIN_TEXT_DOMAIN), 'manage_options', 'ajaxy_sf_admin', array(&$this, 'admin_page'));
     }
     function admin_page()
     {
@@ -168,7 +153,7 @@ class SF
                             $AjaxyLiveSearch->set_setting($id, $setting);
                             $k++;
                         }
-                        $message = sprintf(_('%s templates hidden'), $k);
+                        $message = sprintf(esc_html__('%s templates hidden', \AJAXY_SF_PLUGIN_TEXT_DOMAIN), $k);
                     } elseif ($action == 'show' && $ids) {
                         global $AjaxyLiveSearch;
                         $k = 0;
@@ -178,7 +163,7 @@ class SF
                             $AjaxyLiveSearch->set_setting($id, $setting);
                             $k++;
                         }
-                        $message = sprintf(_('%s templates shown'), $k);
+                        $message = sprintf(esc_html__('%s templates shown', \AJAXY_SF_PLUGIN_TEXT_DOMAIN), $k);
                     }
                 } elseif (isset($_GET['show']) && isset($_GET['name'])) {
                     global $AjaxyLiveSearch;
@@ -191,7 +176,7 @@ class SF
                         $setting['show'] = (int)$_GET['show'];
                         $AjaxyLiveSearch->set_setting($_GET['name'], $setting);
                     }
-                    $message = _('Template modified');
+                    $message = esc_html__('Template modified', AJAXY_SF_PLUGIN_TEXT_DOMAIN);
                 }
                 break;
             case 'themes':
@@ -204,44 +189,19 @@ class SF
         }
 
 ?>
-        <style type="text/css">
-            .column-order,
-            .column-limit_results,
-            .column-show_on_search {
-                text-align: center !important;
-                width: 75px;
-            }
-        </style>
         <div class="wrap">
             <div id="icon-edit" class="icon32 icon32-posts-post"><br></div>
-            <h2><?php _e('Ajaxy Instant Search'); ?></h2>
+            <h2><?php esc_html_e('Ajaxy Instant Search', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></h2>
             <nav class="nav-tab-wrapper">
-                <a href="<?php echo menu_page_url('ajaxy_sf_admin', false); ?>" class="nav-tab <?php echo (!$tab ? 'nav-tab-active' : ''); ?>"><?php _e('General settings'); ?><span class="count"></span></a>
-                <a href="<?php echo menu_page_url('ajaxy_sf_admin', false) . '&tab=post_type'; ?>" class="nav-tab <?php echo ($tab == 'post_type' ? 'nav-tab-active' : ''); ?>"><?php _e('Post type'); ?><span class="count"></span></a>
-                <a href="<?php echo menu_page_url('ajaxy_sf_admin', false) . '&tab=taxonomy'; ?>" class="nav-tab <?php echo ($tab == 'taxonomy' ? 'nav-tab-active' : ''); ?>"><?php _e('Taxonomy'); ?><span class="count"></span></a>
-                <a href="<?php echo menu_page_url('ajaxy_sf_admin', false) . '&tab=author'; ?>" class="nav-tab <?php echo ($tab == 'author' ? 'nav-tab-active' : ''); ?>"><?php _e('Author'); ?><span class="count"></span></a>
-                <a href="<?php echo menu_page_url('ajaxy_sf_admin', false) . '&tab=woocommerce'; ?>" class="nav-tab ajaxy-sf-new <?php echo ($tab == 'woocommerce' ? 'nav-tab-active' : ''); ?>"><?php _e('WooCommerce'); ?><span class="count-new">New *</span></a>
-                <a href="<?php echo menu_page_url('ajaxy_sf_admin', false) . '&tab=themes'; ?>" class="nav-tab <?php echo ($tab == 'themes' ? 'nav-tab-active' : ''); ?>"><?php _e('Themes'); ?><span class="count"></span></a>
-                <a href="<?php echo menu_page_url('ajaxy_sf_admin', false) . '&tab=shortcode'; ?>" class="nav-tab <?php echo ($tab == 'shortcode' ? 'nav-tab-active' : ''); ?>"><?php _e('Shortcodes'); ?><span class="count"></span></a>
-                <a href="<?php echo menu_page_url('ajaxy_sf_admin', false) . '&tab=preview'; ?>" class="nav-tab <?php echo ($tab == 'preview' ? 'nav-tab-active' : ''); ?>"><?php _e('Preview'); ?><span class="count"></span></a>
-                <!-- <a href="<?php echo menu_page_url('ajaxy_sf_admin', false) . '&tab=license'; ?>" class="nav-tab <?php echo ($tab == 'license' ? 'nav-tab-active' : ''); ?>"><?php _e('License'); ?><span class="count"></span></a> -->
+                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false)); ?>" class="nav-tab <?php echo (!$tab ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('General settings', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?><span class="count"></span></a>
+                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=post_type'); ?>" class="nav-tab <?php echo esc_attr($tab == 'post_type' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('Post type', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?><span class="count"></span></a>
+                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=taxonomy'); ?>" class="nav-tab <?php echo esc_attr($tab == 'taxonomy' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('Taxonomy', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?><span class="count"></span></a>
+                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=author'); ?>" class="nav-tab <?php echo esc_attr($tab == 'author' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('Author', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?><span class="count"></span></a>
+                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=woocommerce'); ?>" class="nav-tab ajaxy-sf-new <?php echo ($tab == 'woocommerce' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('WooCommerce', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?><span class="count-new">New *</span></a>
+                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=themes'); ?>" class="nav-tab <?php echo esc_attr($tab == 'themes' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('Themes', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?><span class="count"></span></a>
+                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=shortcode'); ?>" class="nav-tab <?php echo esc_attr($tab == 'shortcode' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('Shortcodes', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?><span class="count"></span></a>
+                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=preview'); ?>" class="nav-tab <?php echo esc_attr($tab == 'preview' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('Preview', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?><span class="count"></span></a>
             </nav>
-
-            <?php /*<div id="message-bottom" class="updated">
-                <table>
-                    <tr>
-                        <td>
-                            <p>
-                                <?php printf(__('please donate some dollars for this project development and themes to be created, we are trying to make this project better, if you think it is worth it then u should support it.
-							contact me at %s for support and development, please include your paypal id or donation id in your message.'), '<a href="mailto:icu090@gmail.com">icu090@gmail.com</a>', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?>
-                            </p>
-                        </td>
-                        <td>
-                            <a target="_blank" href="https://www.paypal.com/donate/?hosted_button_id=5RZ2BQNUUREXN"><img class="aligncenter size-full wp-image-180" title="btn_donateCC_LG" alt="" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" width="147" height="47"></a>
-                        </td>
-                    </tr>
-                </table>
-            </div>*/ ?>
             <form id="ajaxy-form" action="" method="post">
                 <?php wp_nonce_field(); ?>
                 <?php if ($tab == 'post_type') : ?>
@@ -252,7 +212,7 @@ class SF
                     <div>
                         <?php if ($message) : ?>
                             <div id="message" class="updated">
-                                <p><?php echo $message; ?></p>
+                                <p><?php echo esc_html($message); ?></p>
                             </div>
                         <?php endif; ?>
                         <?php $list_table->display(); ?>
@@ -264,7 +224,7 @@ class SF
                     <div>
                         <?php if ($message) : ?>
                             <div id="message" class="updated">
-                                <p><?php echo $message; ?></p>
+                                <p><?php echo esc_html($message); ?></p>
                             </div>
                         <?php endif; ?>
                         <?php $list_table->display(); ?>
@@ -276,7 +236,7 @@ class SF
                     <div>
                         <?php if ($message) : ?>
                             <div id="message" class="updated">
-                                <p><?php echo $message; ?></p>
+                                <p><?php echo esc_html($message); ?></p>
                             </div>
                         <?php endif; ?>
                         <?php $list_table->display(); ?>
@@ -288,7 +248,7 @@ class SF
                     <div>
                         <?php if ($message) : ?>
                             <div id="message" class="updated">
-                                <p><?php echo $message; ?></p>
+                                <p><?php echo esc_html($message); ?></p>
                             </div>
                         <?php endif; ?>
                         <?php $list_table->display(); ?>
@@ -300,28 +260,28 @@ class SF
                         <?php ajaxy_search_form(); ?>
                     </div>
                     <hr style="margin:20px 0 10px 0" />
-                    <p class="description"><?php _e('Use the form above to preview theme changes and settings, please note that the changes could vary from one theme to another, please contact the author of this plugin for more help', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></p>
+                    <p class="description"><?php esc_html_e('Use the form above to preview theme changes and settings, please note that the changes could vary from one theme to another, please contact the author of this plugin for more help', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></p>
                     <hr style="margin:10px 0" />
                 <?php elseif ($tab == 'woocommerce') :
                     $list_table = new Admin\Classes\List_Table($this->get_search_objects(true, 'taxonomy', array(), self::$woocommerce_taxonomies));
                 ?>
-                    <h3><?php _e('WooCommerce Taxonomies'); ?></h3>
+                    <h3><?php esc_html_e('WooCommerce Taxonomies', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></h3>
                     <div class="ajaxy-form-nowrap">
                         <?php if ($message) : ?>
                             <div id="message" class="updated">
-                                <p><?php echo $message; ?></p>
+                                <p><?php echo esc_html($message); ?></p>
                             </div>
                         <?php endif; ?>
                         <?php $list_table->display(); ?>
                     </div>
-                    <h3><?php _e('WooCommerce Post Types'); ?></h3>
+                    <h3><?php esc_html_e('WooCommerce Post Types', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></h3>
                     <?php
                     $list_table = new Admin\Classes\List_Table($this->get_search_objects(true, 'post_type', self::$woocommerce_post_types, array()));
                     ?>
                     <div class="ajaxy-form-nowrap">
                         <?php if ($message) : ?>
                             <div id="message" class="updated">
-                                <p><?php echo $message; ?></p>
+                                <p><?php echo esc_html($message); ?></p>
                             </div>
                         <?php endif; ?>
                         <?php $list_table->display(); ?>
@@ -329,38 +289,36 @@ class SF
                 <?php elseif ($tab == 'author') :
                     $list_table = new Admin\Classes\List_Table($this->get_search_objects(false, 'author'), true, 'role_');
                 ?>
-                    <h3><?php _e('WooCommerce Taxonomies'); ?></h3>
+                    <h3><?php esc_html_e('WooCommerce Taxonomies', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></h3>
                     <div class="ajaxy-form-nowrap">
                         <?php if ($message) : ?>
                             <div id="message" class="updated">
-                                <p><?php echo $message; ?></p>
+                                <p><?php echo esc_html($message); ?></p>
                             </div>
                         <?php endif; ?>
                         <?php $list_table->display(); ?>
                     </div>
-                    <h3><?php _e('WooCommerce Post Types'); ?></h3>
+                    <h3><?php esc_html_e('WooCommerce Post Types', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></h3>
                     <?php
                     $list_table = new Admin\Classes\List_Table($this->get_search_objects(true, 'post_type', self::$woocommerce_post_types, array()));
                     ?>
                     <div class="ajaxy-form-nowrap">
                         <?php if ($message) : ?>
                             <div id="message" class="updated">
-                                <p><?php echo $message; ?></p>
+                                <p><?php echo esc_html($message); ?></p>
                             </div>
                         <?php endif; ?>
                         <?php $list_table->display(); ?>
                     </div>
                 <?php elseif ($tab == 'shortcode') :
                     include_once('admin/admin-shortcodes.php');
-                elseif ($tab == 'license') :
-                    include_once('admin/admin-license.php');
                 else :
                     include_once('admin/admin-settings.php');
                 endif; ?>
             </form>
 
         </div>
-    <?php
+<?php
     }
 
     function get_image_from_content($content, $width_max, $height_max)
@@ -384,9 +342,7 @@ class SF
             }
         }
         if ($styles['aspect_ratio'] > 0) {
-            set_time_limit(0);
             try {
-                set_time_limit(1);
                 list($width, $height, $type, $attr) = @getimagesize($theImageSrc);
                 if ($width > 0 && $height > 0) {
                     if ($width < $width_max && $height < $height_max) {
@@ -405,7 +361,6 @@ class SF
                     }
                 }
             } catch (\Exception $e) {
-                set_time_limit(60);
                 return array('src' => $theImageSrc, 'width' => $styles['thumb_width'], 'height' => $styles['thumb_height']);
             }
         } else {
@@ -464,7 +419,7 @@ class SF
                         $search[] = array(
                             'order' => $setting->order,
                             'name' => $post_type->name,
-                            'label' => __(empty($setting->title) ? $post_type->label : $setting->title, AJAXY_SF_PLUGIN_TEXT_DOMAIN),
+                            'label' => empty($setting->title) ? $post_type->label : $setting->title,
                             'type' =>     'post_type'
                         );
                     }
@@ -473,7 +428,7 @@ class SF
                     $search[] = array(
                         'order' => $setting->order,
                         'name' => $post_type->name,
-                        'label' => __(empty($setting->title) ? $post_type->label : $setting->title, AJAXY_SF_PLUGIN_TEXT_DOMAIN),
+                        'label' => empty($setting->title) ? $post_type->label : $setting->title,
                         'type' =>     'post_type'
                     );
                 }
@@ -489,7 +444,7 @@ class SF
                         $search[] = array(
                             'order' => $setting->order,
                             'name' => $taxonomy->name,
-                            'label' => __(empty($setting->title) ? $taxonomy->label : $setting->title, AJAXY_SF_PLUGIN_TEXT_DOMAIN),
+                            'label' => empty($setting->title) ? $taxonomy->label : $setting->title,
                             'type' =>     'taxonomy',
                             'show_posts' => $show_post_category
                         );
@@ -499,7 +454,7 @@ class SF
                     $search[] = array(
                         'order' => $setting->order,
                         'name' => $taxonomy->name,
-                        'label' => __(empty($setting->title) ? $taxonomy->label : $setting->title, AJAXY_SF_PLUGIN_TEXT_DOMAIN),
+                        'label' => empty($setting->title) ? $taxonomy->label : $setting->title,
                         'type' =>     'taxonomy',
                         'show_posts' => $show_post_category
                     );
@@ -516,7 +471,7 @@ class SF
                         $search[] = array(
                             'order' => $setting->order,
                             'name' => $taxonomy->name,
-                            'label' => __(empty($setting->title) ? $taxonomy->label : $setting->title, AJAXY_SF_PLUGIN_TEXT_DOMAIN),
+                            'label' => empty($setting->title) ? $taxonomy->label : $setting->title,
                             'type' =>     'taxonomy',
                             'show_posts' => $show_post_category
                         );
@@ -526,7 +481,7 @@ class SF
                     $search[] = array(
                         'order' => $setting->order,
                         'name' => $taxonomy->name,
-                        'label' => __(empty($setting->title) ? $taxonomy->label : $setting->title, AJAXY_SF_PLUGIN_TEXT_DOMAIN),
+                        'label' => empty($setting->title) ? $taxonomy->label : $setting->title,
                         'type' =>     'taxonomy',
                         'show_posts' => $show_post_category
                     );
@@ -545,7 +500,7 @@ class SF
                         $search[] = array(
                             'order' => $setting->order,
                             'name' => $role,
-                            'label' => __(empty($setting->title) ? $label : $setting->title, AJAXY_SF_PLUGIN_TEXT_DOMAIN),
+                            'label' => empty($setting->title) ? $label : $setting->title,
                             'type' =>     'role'
                         );
                     }
@@ -554,7 +509,7 @@ class SF
                     $search[] = array(
                         'order' => $setting->order,
                         'name' => $role,
-                        'label' => __(empty($setting->title) ? $label : $setting->title, AJAXY_SF_PLUGIN_TEXT_DOMAIN),
+                        'label' => empty($setting->title) ? $label : $setting->title,
                         'type' =>     'role'
                     );
                 }
@@ -573,28 +528,28 @@ class SF
     }
     function set_templates($template, $html)
     {
-        if (get_option('sf_template_' . $template) !== false) {
-            update_option('sf_template_' . $template, stripslashes($html));
+        if (get_option('ajaxy_sf_template_' . $template) !== false) {
+            update_option('ajaxy_sf_template_' . $template, stripslashes($html));
         } else {
-            add_option('sf_template_' . $template, stripslashes($html));
+            add_option('ajaxy_sf_template_' . $template, stripslashes($html));
         }
     }
     function set_setting($name, $value)
     {
-        if (get_option('sf_setting_' . $name) !== false) {
-            update_option('sf_setting_' . $name, wp_json_encode($value));
+        if (get_option('ajaxy_sf_setting_' . $name) !== false) {
+            update_option('ajaxy_sf_setting_' . $name, wp_json_encode($value));
         } else {
-            add_option('sf_setting_' . $name, wp_json_encode($value));
+            add_option('ajaxy_sf_setting_' . $name, wp_json_encode($value));
         }
     }
     function remove_setting($name)
     {
-        delete_option('sf_setting_' . $name);
+        delete_option('ajaxy_sf_setting_' . $name);
     }
     function get_setting($name, $public = true)
     {
         $show = 0;
-        if(\in_array($name, ['category', 'post', 'page', 'product'])){
+        if (\in_array($name, ['category', 'post', 'page', 'product'])) {
             $show = 1;
         }
         $defaults = array(
@@ -609,8 +564,8 @@ class SF
         if (!$public) {
             $defaults['show'] = 0;
         }
-        if (get_option('sf_setting_' . $name) !== false) {
-            $settings = json_decode(get_option('sf_setting_' . $name));
+        if (get_option('ajaxy_sf_setting_' . $name) !== false) {
+            $settings = json_decode(get_option('ajaxy_sf_setting_' . $name));
             foreach ($defaults as $key => $value) {
                 if (!isset($settings->{$key})) {
                     $settings->{$key} = $value;
@@ -623,73 +578,72 @@ class SF
     }
     function set_styles(array $names)
     {
-        $styles = get_option('sf_styles');
+        $styles = get_option('ajaxy_sf_styles');
         if ($styles !== false) {
             $styles = array_merge($styles, $names);
-            update_option('sf_styles', $styles);
+            update_option('ajaxy_sf_styles', $styles);
         } else {
-            add_option('sf_styles', $names);
+            add_option('ajaxy_sf_styles', $names);
         }
     }
 
     function clear_styles()
     {
-        delete_option('sf_styles');
+        delete_option('ajaxy_sf_styles');
     }
     function get_styles($default = [])
     {
-        $styles = get_option('sf_styles') ?? [];
+        $styles = get_option('ajaxy_sf_styles', []) ?? [];
 
         $options = [];
         //migrate
 
         foreach ($default as $key => $value) {
             if (!isset($styles[$key])) {
-                $option = get_option('sf_style_' . $key, $value);
+                $option = get_option('ajaxy_sf_style_' . $key, $value);
                 if ($option !== false) {
                     $options[$key] = $option;
                 }
-                delete_option('sf_style_' . $key);
+                delete_option('ajaxy_sf_style_' . $key);
             }
         }
 
-
         if (count($options) > 0) {
             $out = \array_replace($default, (array)$styles, $options);
-            update_option('sf_styles', $out);
+            update_option('ajaxy_sf_styles', $out);
             return $out;
         }
         return \array_replace($default, (array)$styles);
     }
     function remove_template($template)
     {
-        delete_option('sf_template_' . $template);
+        delete_option('ajaxy_sf_template_' . $template);
     }
     function get_templates($template, $type = '')
     {
         $template_post = "";
         switch ($type) {
             case 'more':
-                $template_post = get_option('sf_template_more');
+                $template_post = get_option('ajaxy_sf_template_more');
                 if (!$template_post) {
                     $template_post = '<a href="{search_url_escaped}"><span class="sf-text">See more results for "{search_value}"</span><span class="sf-small">Displaying top {total} results</span></a>';
                 }
                 break;
             case 'taxonomy':
-                $template_post = get_option('sf_template_' . $template);
+                $template_post = get_option('ajaxy_sf_template_' . $template);
                 if (!$template_post) {
                     $template_post = '<a href="{category_link}">{name}</a>';
                 }
                 break;
             case 'author':
             case 'role':
-                $template_post = get_option('sf_template_' . $template);
+                $template_post = get_option('ajaxy_sf_template_' . $template);
                 if (!$template_post) {
                     $template_post = '<a href="{author_link}">{user_nicename}</a>';
                 }
                 break;
             case 'post_type':
-                $template_post = get_option('sf_template_' . $template);
+                $template_post = get_option('ajaxy_sf_template_' . $template);
                 if (!$template_post && in_array($template, self::$woocommerce_post_types)) {
                     $template_post = sprintf($this->default_templates['post'], '{post_link}', '{post_image_html}', '{post_title} - {price}', 'Posted by {post_author} on {post_date_formatted}');
                 } elseif (!$template_post) {
@@ -697,7 +651,7 @@ class SF
                 }
                 break;
             default:
-                $template_post = get_option('sf_template_' . $template);
+                $template_post = get_option('ajaxy_sf_template_' . $template);
                 if (!$template_post) {
                     $template_post = sprintf($this->default_templates['post'], '{post_link}', '{post_image_html}', '{post_title}', 'Posted by {post_author} on {post_date_formatted}');
                 }
@@ -856,26 +810,40 @@ class SF
         }
 
         $order_results = ($setting->order_results ? " ORDER BY " . $setting->order_results : "");
-        $results = array();
 
-        $query = "
-			SELECT
-				$wpdb->posts.ID
-			FROM
-				$wpdb->posts
-			WHERE
-				(post_title LIKE %s " . ($setting->search_content == 1 ? "or post_content LIKE %s)" : ")") . "
-				AND post_status='publish'
-				AND post_type = %s
-				%s
-				%s
-			LIMIT 0, %d";
+        $results = array();
 
         $search = '%' . $wpdb->esc_like($name) . '%';
 
-        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-        $results = $wpdb->get_results($setting->search_content == 1 ? $wpdb->prepare($query, $search, $search, $post_type, $excludes, $order_results, $setting->limit) : $wpdb->prepare($query, $search, $post_type, $excludes, $order_results, $setting->limit));
-
+        if ($setting->search_content == 1) {
+            $query = "
+                SELECT
+                    $wpdb->posts.ID
+                FROM
+                    $wpdb->posts
+                WHERE
+                    (post_title LIKE %s or post_content LIKE %s)
+                    AND post_status='publish'
+                    AND post_type = %s
+                    %s
+                    %s
+                LIMIT 0, %d";
+            $results = $wpdb->get_results($wpdb->prepare($query, $search, $search, $post_type, $excludes, $order_results, $setting->limit));
+        } else {
+            $query = "
+                SELECT
+                    $wpdb->posts.ID
+                FROM
+                    $wpdb->posts
+                WHERE
+                    (post_title LIKE %s)
+                    AND post_status='publish'
+                    AND post_type = %s
+                    %s
+                    %s
+                LIMIT 0, %d";
+            $results = $wpdb->get_results($wpdb->prepare($query, $search, $post_type, $excludes, $order_results, $setting->limit));
+        }
 
         if (sizeof($results) > 0 && is_array($results) && !is_wp_error($results)) {
             $template = $this->get_templates($post_type, 'post_type');
@@ -909,7 +877,7 @@ class SF
         );
         $term_query = new \WP_Query($args);
         if ($term_query->have_posts()) :
-            $psts = apply_filters('sf_pre_term_posts', $term_query->posts);
+            $psts = apply_filters('ajaxy_sf_pre_term_posts', $term_query->posts);
             if (sizeof($psts) > 0) {
                 foreach ($psts as $p) {
                     $matches = array();
@@ -918,7 +886,7 @@ class SF
                     $posts[] = $this->post_object($p->ID, false, $matches[0]);
                 }
             }
-            $posts = apply_filters('sf_term_posts', $posts);
+            $posts = apply_filters('ajaxy_sf_term_posts', $posts);
         endif;
         return $posts;
     }
@@ -981,7 +949,7 @@ class SF
                     }
                 }
             }
-            if ($post->post_type == 'product' && class_exists('WC_Product_Factory')) {
+            if ($post->post_type == 'product' && class_exists('\WC_Product_Factory')) {
                 $product_factory = new \WC_Product_Factory();
                 global $product;
                 $product = $product_factory->get_product($post);
@@ -1063,15 +1031,15 @@ class SF
                     $custom_field = get_post_meta($post->ID, $key, true);
                     if (is_array($custom_field)) {
                         $cf_name = 'custom_field_' . $key;
-                        $post_object->{$cf_name} = apply_filters('sf_post_custom_field', $custom_field[0], $key, $post);
+                        $post_object->{$cf_name} = apply_filters('ajaxy_sf_post_custom_field', $custom_field[0], $key, $post);
                     } else {
                         $cf_name = 'custom_field_' . $key;
-                        $post_object->{$cf_name} = apply_filters('sf_post_custom_field', $custom_field, $key, $post);
+                        $post_object->{$cf_name} = apply_filters('ajaxy_sf_post_custom_field', $custom_field, $key, $post);
                     }
                 }
             }
 
-            $post_object = apply_filters('sf_post', $post_object);
+            $post_object = apply_filters('ajaxy_sf_post', $post_object);
             return $post_object;
         }
         return false;
@@ -1087,11 +1055,49 @@ class SF
     }
     function enqueue_scripts()
     {
-        wp_enqueue_script('jquery');
-        wp_enqueue_script('ajaxy-sf-search', AJAXY_SF_PLUGIN_URL . "js/app.js", array(), AJAXY_SF_VERSION, false);
-        $this->enqueue_styles();
+        wp_enqueue_script('ajaxy-sf-search', AJAXY_SF_PLUGIN_URL . "js/app.js", array(), AJAXY_SF_VERSION, true);
+        $this->enqueue_common_styles();
     }
-    function enqueue_styles()
+
+    function admin_enqueue_scripts()
+    {
+        $tab = $_GET['tab'] ?? 'settings';
+        if ($tab == 'preview') {
+            wp_enqueue_script('ajaxy-sf-search', AJAXY_SF_PLUGIN_URL . "js/app.js", array(), AJAXY_SF_VERSION, true);
+        }
+        if ($tab == 'shortcode') {
+            wp_enqueue_script('ajaxy-sf-search', AJAXY_SF_PLUGIN_URL . "js/app.js", array(), AJAXY_SF_VERSION, true);
+
+            wp_add_inline_script('ajaxy-sf-search', '
+            jQuery(document).ready(function() {
+                jQuery("#ajaxy-form").submit(function(e) {
+                    var postData = jQuery(this).serializeArray();
+                    jQuery.ajax({
+                        url: ajaxurl,
+                        type: "POST",
+                        data: postData,
+                        success: function(data, textStatus, jqXHR) {
+                            jQuery("#shortcode-text").val(data);
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            //if fails      
+                        }
+                    });
+                    e.preventDefault(); //STOP default action
+                    //e.unbind(); //unbind. to stop multiple form submit.
+                    return false;
+                });
+                jQuery("#shortcode-text").dblclick(function() {
+                    jQuery(this).select();
+                });
+            });', 'after');
+        }
+
+        wp_enqueue_style('ajaxy-sf-admin-styles', AJAXY_SF_PLUGIN_URL . "admin/css/styles.css");
+        $this->enqueue_common_styles();
+    }
+
+    function enqueue_common_styles()
     {
         $themes = $this->get_installed_themes(AJAXY_THEMES_DIR, 'themes');
         $style = AJAXY_SF_PLUGIN_URL . "themes/default/style.css";
@@ -1107,22 +1113,9 @@ class SF
             if (\file_exists(AJAXY_THEMES_DIR . $theme . '/theme.js')) {
                 wp_enqueue_script('ajaxy-sf-theme', AJAXY_SF_PLUGIN_URL . 'themes/' . $theme . '/theme.js', array(), '1.0.0', true);
             }
-        }
-    }
-    function head()
-    {
-        $css = $this->get_styles()['css'] ?? '';
-    ?>
-        <!-- AJAXY SEARCH V <?php echo AJAXY_SF_VERSION; ?>-->
-        <?php if (!is_admin() && trim($css) != '') : ?>
-            <style type="text/css">
-                <?php echo $css; ?>
-            </style>
-        <?php
-        endif;
-        if (is_admin()) { ?>
-            <link rel="stylesheet" type="text/css" href="<?php echo AJAXY_SF_PLUGIN_URL; ?>/admin/css/styles.css" />
-        <?php
+
+            $css = $this->get_styles()['css'] ?? '';
+            wp_add_inline_style('ajaxy-sf-theme', $css);
         }
 
         $styles = $this->get_styles(
@@ -1136,6 +1129,7 @@ class SF
                 'results_width_unit' => 'px',
             ]
         );
+
         $settings = [
             'more' => $this->get_templates('more', 'more'),
             'boxes' => [
@@ -1143,7 +1137,7 @@ class SF
                     'selector' => \trim($styles['input_id']),
                     'options' => array(
                         'searchUrl' => $styles['search_url'],
-                        'text' => __($styles['search_label'], AJAXY_SF_PLUGIN_TEXT_DOMAIN),
+                        'text' => $styles['search_label'],
                         'delay' => $styles['delay'],
                         'iwidth' => $styles['width'],
                         'width' => $styles['results_width'] . $styles['results_width_unit'],
@@ -1153,15 +1147,9 @@ class SF
                 ]
             ],
         ];
-        ?>
-        <script type="text/javascript">
-            /* <![CDATA[ */
-            var AjaxyLiveSearchSettings = <?php echo wp_json_encode($settings); ?>;
-            /* ]]> */
-        </script>
-<?php
-    }
 
+        wp_add_inline_script('ajaxy-sf-search', 'var AjaxyLiveSearchSettings = ' . wp_json_encode($settings), 'before');
+    }
 
     public function is_wpml()
     {
@@ -1251,7 +1239,7 @@ class SF
     function get_search_results()
     {
         $results = array();
-        $sf_value = apply_filters('sf_value', $_POST['value']);
+        $sf_value = apply_filters('ajaxy_sf_value', $_POST['value']);
         if (!empty($sf_value)) {
             //filter taxonomies if set
             $arg_taxonomies = isset($_POST['taxonomies']) && trim($_POST['taxonomies']) != "" ? explode(',', trim($_POST['taxonomies'])) : array();
@@ -1262,7 +1250,6 @@ class SF
             $author_searched = false;
             $authors = array();
             foreach ($search as $key => $object) {
-                $object['label'] = __($object['label']);
                 if ($object['type'] == 'post_type') {
                     $posts_result = $this->posts($sf_value, $object['name']);
                     if (sizeof($posts_result) > 0) {
@@ -1312,10 +1299,10 @@ class SF
                     }
                 }
             }
-            $results = apply_filters('sf_results', $results);
+            $results = apply_filters('ajaxy_sf_results', $results);
             echo wp_json_encode($results);
         }
-        do_action('sf_value_results', $sf_value, $results);
+        do_action('ajaxy_sf_value_results', $sf_value, $results);
         exit;
     }
     function get_installed_themes($themeDir, $themeFolder)
@@ -1358,9 +1345,6 @@ class SF
     }
     function form($settings)
     {
-        if (!$this->license->is_licensed()) {
-            return '';
-        }
         $template = '<!-- Ajaxy Search Form v%s -->
 		<div id="%s" class="sf-form-container">
 			<form role="search" method="get" class="searchform" action="%s" >
@@ -1384,12 +1368,12 @@ class SF
             AJAXY_SF_VERSION,
             $settings['id'],
             home_url('/'),
-            __('Search for:', AJAXY_SF_PLUGIN_TEXT_DOMAIN),
+            esc_attr__('Search for:', AJAXY_SF_PLUGIN_TEXT_DOMAIN),
             $settings['border'] ?? '',
             $settings['iwidth'] ?? '',
             get_search_query(),
             $settings['label'],
-            esc_attr__(__('Search', AJAXY_SF_PLUGIN_TEXT_DOMAIN))
+            esc_attr__('Search', AJAXY_SF_PLUGIN_TEXT_DOMAIN)
         );
         if ($settings['credits'] == 1) {
             $form = $form . '<a style="display:none" href="http://www.ajaxy.org">Powered by Ajaxy</a>';
@@ -1399,9 +1383,6 @@ class SF
 
     function form_shortcode($atts = array())
     {
-        if (!$this->license->is_licensed()) {
-            return '';
-        }
         $m = uniqid('sf');
         $scat = (array)$this->get_setting('category');
 
@@ -1450,13 +1431,9 @@ class SF
 
         $live_search_settings = shortcode_atts($live_search_settings, $atts, 'ajaxy-live-search');
 
-        $script = '
-		<script type="text/javascript">
-			/* <![CDATA[ */
-                var formSearch' . $m . ' = new SF("#' . $m . ' .sf-input", ' . wp_json_encode($live_search_settings) . ');
-			/* ]]> */
-		</script>';
-        return $form . $script;
+        wp_add_inline_script('ajaxy-sf-search', 'var formSearch' . $m . ' = new SF("#' . $m . ' .sf-input", ' . wp_json_encode($live_search_settings) . ');', 'after');
+
+        return $form;
     }
 }
 function ajaxy_search_form($settings = array())
