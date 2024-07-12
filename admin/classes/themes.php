@@ -11,7 +11,7 @@
 
 namespace Ajaxy\LiveSearch\Admin\Classes;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if (!defined('ABSPATH')) exit;
 
 class Themes extends \WP_List_Table
 {
@@ -46,9 +46,9 @@ class Themes extends \WP_List_Table
     function get_columns()
     {
         $columns = array(
-            'title'    => __('Theme', AJAXY_SF_PLUGIN_TEXT_DOMAIN),
-            'directory'        => __('Directory', AJAXY_SF_PLUGIN_TEXT_DOMAIN),
-            'stylesheet_url'        => __('Stylesheet URL', AJAXY_SF_PLUGIN_TEXT_DOMAIN)
+            'title'    => __('Theme', "ajaxy-instant-search"),
+            'directory'        => __('Directory', "ajaxy-instant-search"),
+            'stylesheet_url'        => __('Stylesheet URL', "ajaxy-instant-search")
         );
 
         return $columns;
@@ -87,25 +87,18 @@ class Themes extends \WP_List_Table
 
         extract($args, EXTR_SKIP);
 
-        $args['offset'] = $offset = ($page - 1) * $number;
+        $args['offset'] = ($page - 1) * $number;
 
-        // convert it to table rows
         $out = '';
-        $count = 0;
-
-
         if (sizeof($themes) > 0) {
             foreach ($themes as $theme) {
                 $this->single_row($theme);
             }
         }
         if (empty($fields)) {
-            echo '<tr class="no-items"><td class="colspanchange" colspan="' . $this->get_column_count() . '">';
-            $this->no_items();
-            echo '</td></tr>';
-        } else {
-            echo $out;
+            $out = sprintf('<tr class="no-items"><td class="colspanchange" colspan="%s">%s</td></tr>', \esc_attr($this->get_column_count()), esc_html($this->no_items()));
         }
+        echo esc_html($out);
     }
 
     function single_row($field, $level = 0)
@@ -116,11 +109,9 @@ class Themes extends \WP_List_Table
         global $AjaxyLiveSearch;
         $theme = $AjaxyLiveSearch->get_styles()['theme'] ?? '';
         $add_class = ($field['title'] == $theme ? 'row-yes' : 'row-no');
-        $row_class = ($row_class == '' ? ' class="alternate ' . $add_class . '"' : ' class="' . $add_class . '"');
+        $row_class = ($row_class == '' ? ' alternate ' . $add_class : $add_class);
 
-        echo '<tr id="type-sf-theme"' . $row_class . '>';
-        echo $this->single_row_columns($field);
-        echo '</tr>';
+        echo esc_html(sprintf('<tr id="type-sf-theme" class="%s">%s</tr>', esc_attr($row_class), esc_html($this->single_row_columns($field))));
     }
 
     function column_cb($field)
@@ -136,21 +127,22 @@ class Themes extends \WP_List_Table
 
         $edit_link = menu_page_url('ajaxy_sf_admin', false) . '&tab=themes&theme=' . $field['title'] . '&apply=1';
         $edit_link = wp_nonce_url($edit_link, 'hide-post_type_' . $field['title']);
-        $out = '<strong><a class="row-title" href="' . $edit_link . '" title="' . esc_attr(sprintf(esc_html__('Edit &#8220;%s&#8221;'), $name)) . '">' . $name . '</a></strong><br />';
+
+
 
         $actions = array();
 
         $theme = $AjaxyLiveSearch->get_styles()['theme'] ?? 'default';
         if ($theme != $field['title']) :
-            $actions['apply'] = "<a class='hide-field' href='" . $edit_link . "'>" . esc_html__('Apply theme', AJAXY_SF_PLUGIN_TEXT_DOMAIN) . "</a>";
+            $actions['apply'] = "<a class='hide-field' href='" . $edit_link . "'>" . esc_html__('Apply theme', "ajaxy-instant-search") . "</a>";
         else :
-            $actions['apply'] =  esc_html__('Current theme', AJAXY_SF_PLUGIN_TEXT_DOMAIN);
+            $actions['apply'] =  esc_html__('Current theme', "ajaxy-instant-search");
         endif;
-        $out .= $this->row_actions($actions);
-        $out .= '<div class="hidden" id="inline_' . $field['title'] . '">';
-        $out .= '<div class="name">' . $field['title'] . '</div>';
 
-        return $out;
+        /* translators: %s is replaced with the theme name */
+        $out = sprintf('<strong><a class="row-title" href="%s" title="%s">%s</a></strong><br />%s<div class="hidden" id="inline_">%s<div class="name">%s</div></div>', $edit_link, esc_attr(sprintf(__('Edit &#8220;%s&#8221;', 'ajaxy-instant-search'), $name)), esc_attr($name), esc_attr($this->row_actions($actions)), esc_attr($field['title']), esc_attr($field['title']));
+
+        return esc_html($out);
     }
     function column_theme_name($field)
     {

@@ -11,7 +11,7 @@
 
 namespace Ajaxy\LiveSearch\Admin\Classes;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if (!defined('ABSPATH')) exit;
 
 class List_Table extends \WP_List_Table
 {
@@ -40,7 +40,7 @@ class List_Table extends \WP_List_Table
 
     function prepare_items()
     {
-        $search = !empty($_REQUEST['s']) ? trim(stripslashes($_REQUEST['s'])) : '';
+        $search = sanitize_text_field(!empty($_REQUEST['s']) ? trim(stripslashes($_REQUEST['s'])) : '');
 
         $args = array(
             'search' => $search,
@@ -48,11 +48,13 @@ class List_Table extends \WP_List_Table
             'number' => 10,
         );
 
-        if (!empty($_REQUEST['orderby']))
-            $args['orderby'] = trim(stripslashes($_REQUEST['orderby']));
+        $orderBy = !empty($_REQUEST['orderby']) ? trim(stripslashes($_REQUEST['orderby'])) : false;
+        if ($orderBy)
+            $args['orderby'] = sanitize_text_field($orderBy);
 
-        if (!empty($_REQUEST['order']))
-            $args['order'] = trim(stripslashes($_REQUEST['order']));
+        $order = !empty($_REQUEST['order']) ? trim(stripslashes($_REQUEST['order'])) : false;
+        if ($order)
+            $args['order'] = sanitize_text_field($order);
 
         $this->callback_args = $args;
 
@@ -65,15 +67,15 @@ class List_Table extends \WP_List_Table
     function get_bulk_actions()
     {
         $actions = array();
-        $actions['hide'] = __('Hide from results', AJAXY_SF_PLUGIN_TEXT_DOMAIN);
-        $actions['show'] = __('Show in results', AJAXY_SF_PLUGIN_TEXT_DOMAIN);
+        $actions['hide'] = __('Hide from results', "ajaxy-instant-search");
+        $actions['show'] = __('Show in results', "ajaxy-instant-search");
 
         return $actions;
     }
 
     function current_action()
     {
-        if (isset($_REQUEST['action']) && ('hide' == $_REQUEST['action'] || 'hide' == $_REQUEST['action2']))
+        if (isset($_REQUEST['action']) && ('hide' == sanitize_text_field($_REQUEST['action']) || 'hide' == sanitize_text_field($_REQUEST['action2'])))
             return 'bulk-hide';
 
         return parent::current_action();
@@ -83,12 +85,12 @@ class List_Table extends \WP_List_Table
     {
         $columns = array(
             'cb'          => '<input type="checkbox" />',
-            'title'        => __('Title', AJAXY_SF_PLUGIN_TEXT_DOMAIN),
-            'type'    => __('Type', AJAXY_SF_PLUGIN_TEXT_DOMAIN),
-            'search_setting' => __('Search setting', AJAXY_SF_PLUGIN_TEXT_DOMAIN),
-            'show_on_search' => __('Search', AJAXY_SF_PLUGIN_TEXT_DOMAIN),
-            'limit_results' => __('Limit', AJAXY_SF_PLUGIN_TEXT_DOMAIN),
-            'order'            => __('Order', AJAXY_SF_PLUGIN_TEXT_DOMAIN)
+            'title'        => __('Title', "ajaxy-instant-search"),
+            'type'    => __('Type', "ajaxy-instant-search"),
+            'search_setting' => __('Search setting', "ajaxy-instant-search"),
+            'show_on_search' => __('Search', "ajaxy-instant-search"),
+            'limit_results' => __('Limit', "ajaxy-instant-search"),
+            'order'            => __('Order', "ajaxy-instant-search")
         );
 
         return $columns;
@@ -126,8 +128,8 @@ class List_Table extends \WP_List_Table
 
         // convert it to table rows
         $out = '';
-        $_REQUEST['order'] = (isset($_REQUEST['order']) ? $_REQUEST['order'] : '');
-        $_REQUEST['orderby'] = (isset($_REQUEST['orderby']) ? $_REQUEST['orderby'] : '');
+        $args['order'] = sanitize_text_field(isset($_REQUEST['order']) ? $_REQUEST['order'] : '');
+        $args['orderby'] = sanitize_text_field(isset($_REQUEST['orderby']) ? $_REQUEST['orderby'] : '');
 
         if (!empty($this->items)) {
             foreach ($this->items as $object) {
@@ -135,12 +137,10 @@ class List_Table extends \WP_List_Table
             }
         }
         if (empty($this->items)) {
-            echo '<tr class="no-items"><td class="colspanchange" colspan="' . $this->get_column_count() . '">';
-            $this->no_items();
-            echo '</td></tr>';
-        } else {
-            echo $out;
+            $out = sprintf('<tr class="no-items"><td class="colspanchange" colspan="%s">%s</td></tr>', esc_attr($this->get_column_count()), esc_html($this->no_items()));
         }
+
+        echo esc_html($out);
     }
 
     function single_row($field, $level = 0)
@@ -151,19 +151,17 @@ class List_Table extends \WP_List_Table
         $add_class = ($setting['show'] == 1 ? 'row-yes' : 'row-no');
         $this->row_class = ($this->row_class == '' ? 'alternate' : '');
 
-        echo '<tr id="type-' . $field['name'] . '" class="' . $this->row_class . " " . $add_class . '">';
-        echo $this->single_row_columns($field);
-        echo '</tr>';
+        echo esc_html(sprintf('<tr id="type-%s" class="%s %s">%s</tr>', esc_attr($field['name']), esc_attr($this->row_class), esc_attr($add_class), esc_html($this->single_row_columns($field))));
     }
 
     function column_cb($field)
     {
-        return '<input type="checkbox" name="template_id[]" value="' . $field['name'] . '" />';
+        return sprintf('<input type="checkbox" name="template_id[]" value="%s" />', esc_attr($field['name']));
     }
     function column_show_on_search($field)
     {
         $setting = $field['settings'];
-        return '<span>' . ($setting['show'] == 1 ? 'Yes' : 'No') . '</span>';
+        return sprintf('<span>%s</span>', esc_html(($setting['show'] == 1 ? 'Yes' : 'No')));
     }
     function column_search_setting($field)
     {
@@ -200,18 +198,20 @@ class List_Table extends \WP_List_Table
 
         $edit_link = menu_page_url('ajaxy_sf_admin', false) . '&type=' . $field['type'] . '&name=' . $field['name'] . '&edit=1';
 
-
+        /* translators: %s is replaced with the field label */
         $out = '<strong><a class="row-title" href="' . $edit_link . '" title="' . esc_attr(sprintf(__('Edit &#8220;%s&#8221;'), $name)) . '">' . $name . '</a></strong><br />';
 
         $actions = array();
 
-        $actions['edit'] = '<a href="' . $edit_link . '">' . esc_html_e('Edit template & Settings', AJAXY_SF_PLUGIN_TEXT_DOMAIN) . '</a>';
+        $tab = sanitize_text_field(isset($_GET['tab']) ? $_GET['tab'] : '');
+
+        $actions['edit'] = '<a href="' . $edit_link . '">' . esc_html_e('Edit template & Settings', "ajaxy-instant-search") . '</a>';
 
         $setting = (array)$AjaxyLiveSearch->get_setting($this->setting_prefix . $field['name'], $this->public);
         if ($setting['show'] == 1) :
-            $actions['hide'] = "<a class='hide-field' href='" . wp_nonce_url(menu_page_url('ajaxy_sf_admin', false) . '&amp;name=' . $field['name'] . '&amp;type=' . $field['type'] . '&amp;show=0&amp;tab=' . $_GET['tab'], 'hide-post_type_' . $field['name']) . "'>" . esc_html_e('Hide from results', AJAXY_SF_PLUGIN_TEXT_DOMAIN) . "</a>";
+            $actions['hide'] = "<a class='hide-field' href='" . wp_nonce_url(menu_page_url('ajaxy_sf_admin', false) . '&amp;name=' . $field['name'] . '&amp;type=' . $field['type'] . '&amp;show=0&amp;tab=' . $tab, 'hide-post_type_' . $field['name']) . "'>" . esc_html_e('Hide from results', "ajaxy-instant-search") . "</a>";
         else :
-            $actions['show'] = "<a class='show-field' href='" . wp_nonce_url(menu_page_url('ajaxy_sf_admin', false) . '&amp;name=' . $field['name'] . '&amp;type=' . $field['type'] . '&amp;show=1&amp;tab=' . $_GET['tab'], 'show-post_type_' . $field['name']) . "'>" . esc_html_e('show in results', AJAXY_SF_PLUGIN_TEXT_DOMAIN) . "</a>";
+            $actions['show'] = "<a class='show-field' href='" . wp_nonce_url(menu_page_url('ajaxy_sf_admin', false) . '&amp;name=' . $field['name'] . '&amp;type=' . $field['type'] . '&amp;show=1&amp;tab=' . $tab, 'show-post_type_' . $field['name']) . "'>" . esc_html_e('show in results', "ajaxy-instant-search") . "</a>";
         endif;
         $out .= $this->row_actions($actions);
         $out .= '<div class="hidden" id="inline_' . $field['name'] . '">';

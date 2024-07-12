@@ -17,8 +17,6 @@
 
 namespace Ajaxy\LiveSearch;
 
-
-define("AJAXY_SF_PLUGIN_TEXT_DOMAIN", "ajaxy-sf");
 define('AJAXY_SF_VERSION', '6.0.2');
 define('AJAXY_SF_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('AJAXY_THEMES_DIR', dirname(__FILE__) . "/themes/");
@@ -54,8 +52,6 @@ class SF
         add_action('admin_enqueue_scripts', array(&$this, "admin_enqueue_scripts"));
 
         add_action("admin_menu", array(&$this, "menu_pages"));
-        add_action('wp_footer', array(&$this, 'footer'));
-        add_action('admin_footer', array(&$this, 'footer'));
 
         add_action('wp_ajax_ajaxy_sf', array(&$this, 'get_search_results'));
         add_action('wp_ajax_nopriv_ajaxy_sf', array(&$this, 'get_search_results'));
@@ -89,12 +85,12 @@ class SF
     }
     function overview()
     {
-        echo apply_filters('ajaxy-overview', 'main');
+        echo esc_html(apply_filters('ajaxy-overview', 'main'));
     }
 
     function load_textdomain()
     {
-        load_plugin_textdomain(AJAXY_SF_PLUGIN_TEXT_DOMAIN, false, plugin_basename(__DIR__) . '/langs');
+        load_plugin_textdomain("ajaxy-instant-search", false, plugin_basename(__DIR__) . '/langs');
     }
 
     function menu_page_exists($menu_slug)
@@ -111,9 +107,9 @@ class SF
     function menu_pages()
     {
         if (!$this->menu_page_exists('ajaxy-page')) {
-            add_menu_page(_n('Ajaxy', 'Ajaxy', 1, AJAXY_SF_PLUGIN_TEXT_DOMAIN), _n('Ajaxy', 'Ajaxy', 1, AJAXY_SF_PLUGIN_TEXT_DOMAIN), 'Ajaxy', 'ajaxy-page', array(&$this, 'overview'), AJAXY_SF_PLUGIN_URL . '/images/ico.svg');
+            add_menu_page(_n('Ajaxy', 'Ajaxy', 1, "ajaxy-instant-search"), _n('Ajaxy', 'Ajaxy', 1, "ajaxy-instant-search"), 'Ajaxy', 'ajaxy-page', array(&$this, 'overview'), AJAXY_SF_PLUGIN_URL . '/images/ico.svg');
         }
-        add_submenu_page('ajaxy-page', __('Instant Search', AJAXY_SF_PLUGIN_TEXT_DOMAIN), __('Instant Search', AJAXY_SF_PLUGIN_TEXT_DOMAIN), 'manage_options', 'ajaxy_sf_admin', array(&$this, 'admin_page'));
+        add_submenu_page('ajaxy-page', __('Instant Search', "ajaxy-instant-search"), __('Instant Search', "ajaxy-instant-search"), 'manage_options', 'ajaxy_sf_admin', array(&$this, 'admin_page'));
     }
     function admin_page()
     {
@@ -131,8 +127,9 @@ class SF
                 return true;
             }
         }
-        $tab = (!empty($_GET['tab']) ? trim($_GET['tab']) : false);
+        $tab = !empty($_GET['tab']) ? sanitize_text_field(trim($_GET['tab'])) : false;
 
+        $action = isset($_POST['action']) ? sanitize_text_field(trim($_POST['action'])) : false;
         //form data
         switch ($tab) {
             case 'woocommerce':
@@ -141,9 +138,8 @@ class SF
             case 'post_type':
             case 'templates':
                 $public = ($tab == 'author' ? false : true);
-                if (isset($_POST['action'])) {
-                    $action = trim($_POST['action']);
-                    $ids = (isset($_POST['template_id']) ? (array)$_POST['template_id'] : false);
+                if ($action) {
+                    $ids = (isset($_POST['template_id']) ? array_map('intval', (array)$_POST['template_id']) : false);
                     if ($action == 'hide' && $ids) {
                         global $AjaxyLiveSearch;
                         $k = 0;
@@ -153,7 +149,8 @@ class SF
                             $AjaxyLiveSearch->set_setting($id, $setting);
                             $k++;
                         }
-                        $message = sprintf(esc_html__('%s templates hidden', \AJAXY_SF_PLUGIN_TEXT_DOMAIN), $k);
+                        /* translators: s is replaced with the number of templates */
+                        $message = esc_html(sprintf(__('%s templates hidden', "ajaxy-instant-search"), $k));
                     } elseif ($action == 'show' && $ids) {
                         global $AjaxyLiveSearch;
                         $k = 0;
@@ -163,7 +160,8 @@ class SF
                             $AjaxyLiveSearch->set_setting($id, $setting);
                             $k++;
                         }
-                        $message = sprintf(esc_html__('%s templates shown', \AJAXY_SF_PLUGIN_TEXT_DOMAIN), $k);
+                        /* translators: s is replaced with the number of templates */
+                        $message = esc_html(sprintf(__('%s templates shown', "ajaxy-instant-search"), $k));
                     }
                 } elseif (isset($_GET['show']) && isset($_GET['name'])) {
                     global $AjaxyLiveSearch;
@@ -176,7 +174,7 @@ class SF
                         $setting['show'] = (int)$_GET['show'];
                         $AjaxyLiveSearch->set_setting($_GET['name'], $setting);
                     }
-                    $message = esc_html__('Template modified', AJAXY_SF_PLUGIN_TEXT_DOMAIN);
+                    $message = esc_html__('Template modified', "ajaxy-instant-search");
                 }
                 break;
             case 'themes':
@@ -191,16 +189,16 @@ class SF
 ?>
         <div class="wrap">
             <div id="icon-edit" class="icon32 icon32-posts-post"><br></div>
-            <h2><?php esc_html_e('Ajaxy Instant Search', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></h2>
+            <h2><?php esc_html_e('Ajaxy Instant Search', "ajaxy-instant-search"); ?></h2>
             <nav class="nav-tab-wrapper">
-                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false)); ?>" class="nav-tab <?php echo (!$tab ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('General settings', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?><span class="count"></span></a>
-                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=post_type'); ?>" class="nav-tab <?php echo esc_attr($tab == 'post_type' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('Post type', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?><span class="count"></span></a>
-                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=taxonomy'); ?>" class="nav-tab <?php echo esc_attr($tab == 'taxonomy' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('Taxonomy', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?><span class="count"></span></a>
-                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=author'); ?>" class="nav-tab <?php echo esc_attr($tab == 'author' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('Author', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?><span class="count"></span></a>
-                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=woocommerce'); ?>" class="nav-tab ajaxy-sf-new <?php echo ($tab == 'woocommerce' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('WooCommerce', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?><span class="count-new">New *</span></a>
-                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=themes'); ?>" class="nav-tab <?php echo esc_attr($tab == 'themes' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('Themes', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?><span class="count"></span></a>
-                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=shortcode'); ?>" class="nav-tab <?php echo esc_attr($tab == 'shortcode' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('Shortcodes', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?><span class="count"></span></a>
-                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=preview'); ?>" class="nav-tab <?php echo esc_attr($tab == 'preview' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('Preview', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?><span class="count"></span></a>
+                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false)); ?>" class="nav-tab <?php echo (!$tab ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('General settings', "ajaxy-instant-search"); ?><span class="count"></span></a>
+                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=post_type'); ?>" class="nav-tab <?php echo esc_attr($tab == 'post_type' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('Post type', "ajaxy-instant-search"); ?><span class="count"></span></a>
+                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=taxonomy'); ?>" class="nav-tab <?php echo esc_attr($tab == 'taxonomy' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('Taxonomy', "ajaxy-instant-search"); ?><span class="count"></span></a>
+                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=author'); ?>" class="nav-tab <?php echo esc_attr($tab == 'author' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('Author', "ajaxy-instant-search"); ?><span class="count"></span></a>
+                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=woocommerce'); ?>" class="nav-tab ajaxy-sf-new <?php echo ($tab == 'woocommerce' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('WooCommerce', "ajaxy-instant-search"); ?><span class="count-new">New *</span></a>
+                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=themes'); ?>" class="nav-tab <?php echo esc_attr($tab == 'themes' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('Themes', "ajaxy-instant-search"); ?><span class="count"></span></a>
+                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=shortcode'); ?>" class="nav-tab <?php echo esc_attr($tab == 'shortcode' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('Shortcodes', "ajaxy-instant-search"); ?><span class="count"></span></a>
+                <a href="<?php echo esc_url(menu_page_url('ajaxy_sf_admin', false) . '&tab=preview'); ?>" class="nav-tab <?php echo esc_attr($tab == 'preview' ? 'nav-tab-active' : ''); ?>"><?php esc_html_e('Preview', "ajaxy-instant-search"); ?><span class="count"></span></a>
             </nav>
             <form id="ajaxy-form" action="" method="post">
                 <?php wp_nonce_field(); ?>
@@ -260,12 +258,12 @@ class SF
                         <?php ajaxy_search_form(); ?>
                     </div>
                     <hr style="margin:20px 0 10px 0" />
-                    <p class="description"><?php esc_html_e('Use the form above to preview theme changes and settings, please note that the changes could vary from one theme to another, please contact the author of this plugin for more help', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></p>
+                    <p class="description"><?php esc_html_e('Use the form above to preview theme changes and settings, please note that the changes could vary from one theme to another, please contact the author of this plugin for more help', "ajaxy-instant-search"); ?></p>
                     <hr style="margin:10px 0" />
                 <?php elseif ($tab == 'woocommerce') :
                     $list_table = new Admin\Classes\List_Table($this->get_search_objects(true, 'taxonomy', array(), self::$woocommerce_taxonomies));
                 ?>
-                    <h3><?php esc_html_e('WooCommerce Taxonomies', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></h3>
+                    <h3><?php esc_html_e('WooCommerce Taxonomies', "ajaxy-instant-search"); ?></h3>
                     <div class="ajaxy-form-nowrap">
                         <?php if ($message) : ?>
                             <div id="message" class="updated">
@@ -274,7 +272,7 @@ class SF
                         <?php endif; ?>
                         <?php $list_table->display(); ?>
                     </div>
-                    <h3><?php esc_html_e('WooCommerce Post Types', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></h3>
+                    <h3><?php esc_html_e('WooCommerce Post Types', "ajaxy-instant-search"); ?></h3>
                     <?php
                     $list_table = new Admin\Classes\List_Table($this->get_search_objects(true, 'post_type', self::$woocommerce_post_types, array()));
                     ?>
@@ -289,7 +287,7 @@ class SF
                 <?php elseif ($tab == 'author') :
                     $list_table = new Admin\Classes\List_Table($this->get_search_objects(false, 'author'), true, 'role_');
                 ?>
-                    <h3><?php esc_html_e('WooCommerce Taxonomies', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></h3>
+                    <h3><?php esc_html_e('WooCommerce Taxonomies', "ajaxy-instant-search"); ?></h3>
                     <div class="ajaxy-form-nowrap">
                         <?php if ($message) : ?>
                             <div id="message" class="updated">
@@ -298,7 +296,7 @@ class SF
                         <?php endif; ?>
                         <?php $list_table->display(); ?>
                     </div>
-                    <h3><?php esc_html_e('WooCommerce Post Types', AJAXY_SF_PLUGIN_TEXT_DOMAIN); ?></h3>
+                    <h3><?php esc_html_e('WooCommerce Post Types', "ajaxy-instant-search"); ?></h3>
                     <?php
                     $list_table = new Admin\Classes\List_Table($this->get_search_objects(true, 'post_type', self::$woocommerce_post_types, array()));
                     ?>
@@ -394,14 +392,14 @@ class SF
     {
         $search = array();
         $scat = (array)$this->get_setting('category');
-        $arg_category_show = isset($_POST['show_category']) ? $_POST['show_category'] : 1;
+        $arg_category_show = isset($_POST['show_category']) ? (int) $_POST['show_category'] : 1;
 
         $search_taxonomies = false;
 
         if ($scat['show'] == 1 && $arg_category_show == 1) {
             $search_taxonomies = true;
         }
-        $arg_post_category_show = isset($_POST['show_post_category']) ? $_POST['show_post_category'] : 1;
+        $arg_post_category_show = isset($_POST['show_post_category']) ? (int) $_POST['show_post_category'] : 1;
 
         $show_post_category = false;
 
@@ -667,14 +665,13 @@ class SF
         $setting = (object)$this->get_setting($taxonomy);
 
         $excludes = "";
-        $excludes_array = array();
         if (isset($setting->excludes) && sizeof($setting->excludes) > 0 && is_array($setting->excludes)) {
             $excludes = " AND $wpdb->terms.term_id NOT IN (" . implode(',', $setting->excludes) . ")";
-            $excludes_array = $setting->excludes;
         }
         $results = null;
 
-        $query = "
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+        $results = $wpdb->get_results($wpdb->prepare("
 			SELECT
 				distinct($wpdb->terms.name)
 				, $wpdb->terms.term_id
@@ -687,10 +684,7 @@ class SF
 				AND $wpdb->term_taxonomy.taxonomy = %s
 				AND $wpdb->term_taxonomy.term_id = $wpdb->terms.term_id
 			%s
-			LIMIT 0, %d";
-
-        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-        $results = $wpdb->get_results($wpdb->prepare($query, '%' . $wpdb->esc_like($name) . '%', $taxonomy, $excludes, $setting->limit));
+			LIMIT 0, %d", '%' . $wpdb->esc_like($name) . '%', $taxonomy, $excludes, $setting->limit));
 
         if (sizeof($results) > 0 && is_array($results) && !is_wp_error($results)) {
             foreach ($results as $result) {
@@ -752,7 +746,7 @@ class SF
 				)
 		";
         $search = '%' . $wpdb->esc_like($name) . '%';
-        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
         $results = $wpdb->get_results($wpdb->prepare($query, $search, $search, $search));
 
         if (sizeof($results) > 0 && is_array($results) && !is_wp_error($results)) {
@@ -816,7 +810,8 @@ class SF
         $search = '%' . $wpdb->esc_like($name) . '%';
 
         if ($setting->search_content == 1) {
-            $query = "
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+            $results = $wpdb->get_results($wpdb->prepare("
                 SELECT
                     $wpdb->posts.ID
                 FROM
@@ -827,10 +822,10 @@ class SF
                     AND post_type = %s
                     %s
                     %s
-                LIMIT 0, %d";
-            $results = $wpdb->get_results($wpdb->prepare($query, $search, $search, $post_type, $excludes, $order_results, $setting->limit));
+                LIMIT 0, %d", $search, $search, $post_type, $excludes, $order_results, $setting->limit));
         } else {
-            $query = "
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+            $results = $wpdb->get_results($wpdb->prepare("
                 SELECT
                     $wpdb->posts.ID
                 FROM
@@ -841,8 +836,7 @@ class SF
                     AND post_type = %s
                     %s
                     %s
-                LIMIT 0, %d";
-            $results = $wpdb->get_results($wpdb->prepare($query, $search, $post_type, $excludes, $order_results, $setting->limit));
+                LIMIT 0, %d", $search, $post_type, $excludes, $order_results, $setting->limit));
         }
 
         if (sizeof($results) > 0 && is_array($results) && !is_wp_error($results)) {
@@ -862,6 +856,11 @@ class SF
     }
     function posts_by_term($term_id, $taxonomy, $limit = 5)
     {
+        $cache_key = 'term_posts_' . $term_id . '_' . $taxonomy . '_' . $limit;
+        $cached_posts = wp_cache_get($cache_key, 'ajaxy_sf');
+        if ($cached_posts) {
+            return $cached_posts;
+        }
         $posts = array();
         $args = array(
             'showposts' => $limit,
@@ -888,6 +887,9 @@ class SF
             }
             $posts = apply_filters('ajaxy_sf_term_posts', $posts);
         endif;
+
+        //cache the request for 5 minutes maximum just incase the user searches again
+        wp_cache_set($cache_key, $posts, 'ajaxy_sf', 60 * 5);
         return $posts;
     }
     function post_object($id, $term_id = false, $matches = [])
@@ -1093,7 +1095,7 @@ class SF
             });', 'after');
         }
 
-        wp_enqueue_style('ajaxy-sf-admin-styles', AJAXY_SF_PLUGIN_URL . "admin/css/styles.css");
+        wp_enqueue_style('ajaxy-sf-admin-styles', AJAXY_SF_PLUGIN_URL . "admin/css/styles.css", array(), AJAXY_SF_VERSION);
         $this->enqueue_common_styles();
     }
 
@@ -1106,12 +1108,12 @@ class SF
             $style = $themes[$theme]['stylesheet_url'];
         }
         if ($theme != 'blank') {
-            wp_enqueue_style('ajaxy-sf-common', AJAXY_SF_PLUGIN_URL . "themes/common.css");
-            wp_enqueue_style('ajaxy-sf-common-rtl', AJAXY_SF_PLUGIN_URL . "themes/common-rtl.css");
-            wp_enqueue_style('ajaxy-sf-theme', $style);
+            wp_enqueue_style('ajaxy-sf-common', AJAXY_SF_PLUGIN_URL . "themes/common.css", array(), AJAXY_SF_VERSION);
+            wp_enqueue_style('ajaxy-sf-common-rtl', AJAXY_SF_PLUGIN_URL . "themes/common-rtl.css", array(), AJAXY_SF_VERSION);
+            wp_enqueue_style('ajaxy-sf-theme', $style, array(), AJAXY_SF_VERSION);
 
             if (\file_exists(AJAXY_THEMES_DIR . $theme . '/theme.js')) {
-                wp_enqueue_script('ajaxy-sf-theme', AJAXY_SF_PLUGIN_URL . 'themes/' . $theme . '/theme.js', array(), '1.0.0', true);
+                wp_enqueue_script('ajaxy-sf-theme', AJAXY_SF_PLUGIN_URL . 'themes/' . $theme . '/theme.js', array(), AJAXY_SF_VERSION, true);
             }
 
             $css = $this->get_styles()['css'] ?? '';
@@ -1190,14 +1192,11 @@ class SF
         }
         return admin_url('admin-ajax.php');
     }
-    function footer()
-    {
-        //echo $script;
-    }
+
     function get_shortcode()
     {
         if (isset($_POST['sf'])) {
-            $postData = $_POST['sf']['style'];
+            $postData = array_map('sanitize_text_field', (array)$_POST['sf']['style']);
             $m = array();
             $border = "";
             foreach ($postData as $key => $value) {
@@ -1232,19 +1231,19 @@ class SF
             if ($border != "") {
                 $m[] = 'border="' . trim($border) . '"';
             }
-            echo '[ajaxy-live-search ' . implode(' ', $m) . ']';
+            echo esc_html('[ajaxy-live-search ' . implode(' ', $m) . ']');
         }
         exit;
     }
     function get_search_results()
     {
         $results = array();
-        $sf_value = apply_filters('ajaxy_sf_value', $_POST['value']);
+        $sf_value = apply_filters('ajaxy_sf_value', sanitize_text_field($_POST['value']));
         if (!empty($sf_value)) {
             //filter taxonomies if set
-            $arg_taxonomies = isset($_POST['taxonomies']) && trim($_POST['taxonomies']) != "" ? explode(',', trim($_POST['taxonomies'])) : array();
+            $arg_taxonomies = isset($_POST['taxonomies']) && trim($_POST['taxonomies']) != "" ? explode(',', sanitize_text_field(trim($_POST['taxonomies']))) : array();
             // override post_types from input
-            $arg_post_types = isset($_POST['post_types']) && trim($_POST['post_types']) != "" ? explode(',', trim($_POST['post_types'])) : array();
+            $arg_post_types = isset($_POST['post_types']) && trim($_POST['post_types']) != "" ? explode(',', sanitize_text_field(trim($_POST['post_types']))) : array();
 
             $search = $this->get_search_objects(false, false, $arg_post_types, $arg_taxonomies);
             $author_searched = false;
@@ -1368,12 +1367,12 @@ class SF
             AJAXY_SF_VERSION,
             $settings['id'],
             home_url('/'),
-            esc_attr__('Search for:', AJAXY_SF_PLUGIN_TEXT_DOMAIN),
+            esc_attr__('Search for:', "ajaxy-instant-search"),
             $settings['border'] ?? '',
             $settings['iwidth'] ?? '',
             get_search_query(),
             $settings['label'],
-            esc_attr__('Search', AJAXY_SF_PLUGIN_TEXT_DOMAIN)
+            esc_attr__('Search', "ajaxy-instant-search")
         );
         if ($settings['credits'] == 1) {
             $form = $form . '<a style="display:none" href="http://www.ajaxy.org">Powered by Ajaxy</a>';
@@ -1439,7 +1438,7 @@ class SF
 function ajaxy_search_form($settings = array())
 {
     global $AjaxyLiveSearch;
-    echo $AjaxyLiveSearch->form_shortcode($settings);
+    echo esc_html($AjaxyLiveSearch->form_shortcode($settings));
 }
 global $AjaxyLiveSearch;
 $AjaxyLiveSearch = new SF();

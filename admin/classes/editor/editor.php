@@ -2,7 +2,7 @@
 
 namespace Ajaxy\LiveSearch\Admin\Classes\Editor;
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if (!defined('ABSPATH')) exit;
 
 class Editor
 {
@@ -53,13 +53,16 @@ class Editor
             'ajaxy-blocks', // Handle.
             AJAXY_SF_PLUGIN_URL . '/admin/js/editor.js', // Block.js: We register the block here.
             array('wp-blocks', 'wp-i18n', 'wp-element', 'wp-block-editor'), // Dependencies, defined above.
+            AJAXY_SF_VERSION,
+            true // Enqueue the script in the footer.
         );
 
         // Styles.
         wp_enqueue_style(
             'ajaxy-blocks-editor', // Handle.
             AJAXY_SF_PLUGIN_URL . '/admin/css/editor.css', // Block editor CSS.
-            array('wp-edit-blocks')
+            array('wp-edit-blocks'),
+            AJAXY_SF_VERSION
         );
     }
 
@@ -70,7 +73,7 @@ class Editor
                 $block_categories,
                 array(
                     'slug'  => 'ajaxy-blocks',
-                    'title' => __('Ajaxy', AJAXY_SF_PLUGIN_TEXT_DOMAIN),
+                    'title' => __('Ajaxy', "ajaxy-instant-search"),
                     'icon'  => null,
                 )
             );
@@ -120,7 +123,7 @@ class Editor
                 'title' => 'Ajaxy Instant Search',
             ]
         ];
-        
+
         foreach ($blocks as $name => $block) {
             register_block_type(
                 'ajaxy-blocks/' . $name,
@@ -141,7 +144,8 @@ class Editor
     {
         $located = dirname(__FILE__) . '/templates/' . $template_name . '.php';
         if (!file_exists($located)) {
-            _doing_it_wrong(__FUNCTION__, sprintf(esc_html__('%s does not exist.', AJAXY_SF_PLUGIN_TEXT_DOMAIN), '<code>' . esc_html($located) . '</code>'), '1.0');
+            /* translators: %s is replaced with a path */
+            _doing_it_wrong(__FUNCTION__, esc_html(sprintf(__('%s does not exist.', "ajaxy-instant-search"), '<code>' . esc_html($located) . '</code>')), '1.0');
             return 'wrong';
         }
 
