@@ -1,6 +1,6 @@
 <?php
 
-if (!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
 /**
  * Advanced form for inclusion in the administration panels.
@@ -9,16 +9,18 @@ if (!defined('ABSPATH')) exit;
  * @subpackage Administration
  */
 
-$type = isset($_GET['type']) ? $_GET['type'] : exit();
+
+
+$type = sanitize_text_field($_GET['type']);
 $taxonomy = false;
 
-$taxonomy = get_taxonomy($_GET['name']);
+$taxonomy = get_taxonomy(sanitize_text_field($_GET['name']));
 
 /** @var \Ajaxy\LiveSearch\SF $AjaxyLiveSearch */
 global $AjaxyLiveSearch;
 $message = false;
 if (!empty($taxonomy)) {
-    $is_post = $_POST['sf_post'] ?? false;
+    $is_post = isset($_POST['sf_post']) && !empty($_POST['sf_post']) ? true : false;
     if (!empty($is_post)) {
         if (isset($_REQUEST['_wpnonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_wpnonce'])), 'sf_edit')) {
             if (!empty($_POST['sf_' . $taxonomy->name])) {

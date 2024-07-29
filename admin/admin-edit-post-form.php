@@ -1,6 +1,6 @@
 <?php
 
-if (!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
 /**
  * Advanced form for inclusion in the administration panels.
@@ -9,9 +9,9 @@ if (!defined('ABSPATH')) exit;
  * @subpackage Administration
  */
 
-$type = isset($_GET['type']) ? $_GET['type'] : exit();
+$type = sanitize_text_field($_GET['type']);
 
-$post_type = get_post_type_object($_GET['name']);
+$post_type = get_post_type_object(sanitize_text_field($_GET['name']));
 
 /** @var \Ajaxy\LiveSearch\SF $AjaxyLiveSearch */
 global $AjaxyLiveSearch;
@@ -156,7 +156,7 @@ if (!empty($post_type)) {
                                                 </ul>
                                             <?php
                                             } else {
-                                                /* translators: %s is replaced with the post type label */ 
+                                                /* translators: %s is replaced with the post type label */
                                                 echo esc_html(sprintf(__('There are no "%s" excluded yet', "ajaxy-instant-search"), $post_type->label));
                                             }
                                             ?>

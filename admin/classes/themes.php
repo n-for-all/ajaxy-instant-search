@@ -37,7 +37,7 @@ class Themes extends \WP_List_Table
 
     function current_action()
     {
-        if (isset($_REQUEST['action']) && ('hide' == $_REQUEST['action'] || 'hide' == $_REQUEST['action2']))
+        if (isset($_REQUEST['action']) && ('hide' == sanitize_text_field($_REQUEST['action']) || 'hide' == sanitize_text_field($_REQUEST['action2'])))
             return 'bulk-hide';
 
         return parent::current_action();

@@ -13,9 +13,8 @@ if (isset($_POST['sf_rsubmit']) && isset($_POST['_wpnonce']) && wp_verify_nonce(
 } elseif (isset($_POST['sf_submit']) && isset($_POST['_wpnonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])))) {
     $styles = $_POST['sf']['style'];
 
-    $templates = $_POST['sf']['template'];
-
-    $values = array_replace($values, [
+    $more_results = sanitize_text_field(isset($_POST['sf']['template']) ? $_POST['sf']['template']['more_results'] : '');
+    $values = [
         'search_label' => sanitize_text_field($styles['label'] ?? 'Search'),
         'input_id' => sanitize_text_field($styles['input_id']),
         'width' => (int)$styles['width'],
@@ -34,11 +33,11 @@ if (isset($_POST['sf_rsubmit']) && isset($_POST['_wpnonce']) && wp_verify_nonce(
         'css' => sanitize_text_field($styles['css'] ?? ''),
         'thumb_width' => (int)$styles['thumb_width'] ?? 50,
         'thumb_height' => (int)$styles['thumb_height'] ?? 50,
-    ]);
+    ];
 
     $AjaxyLiveSearch->set_styles($values);
 
-    $AjaxyLiveSearch->set_templates('more', $templates['more_results']);
+    $AjaxyLiveSearch->set_templates('more', $more_results);
     $message = esc_html__("Settings saved", "ajaxy-instant-search");
 }
 ?>

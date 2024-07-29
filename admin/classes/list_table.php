@@ -48,13 +48,13 @@ class List_Table extends \WP_List_Table
             'number' => 10,
         );
 
-        $orderBy = !empty($_REQUEST['orderby']) ? trim(stripslashes($_REQUEST['orderby'])) : false;
-        if ($orderBy)
-            $args['orderby'] = sanitize_text_field($orderBy);
+        $orderBy = sanitize_text_field(!empty($_REQUEST['orderby']) ? trim(stripslashes($_REQUEST['orderby'])) : '');
+        if (!empty($orderBy))
+            $args['orderby'] = $orderBy;
 
-        $order = !empty($_REQUEST['order']) ? trim(stripslashes($_REQUEST['order'])) : false;
-        if ($order)
-            $args['order'] = sanitize_text_field($order);
+        $order = sanitize_text_field(!empty($_REQUEST['order']) ? trim(stripslashes($_REQUEST['order'])) : '');
+        if (!empty($order))
+            $args['order'] = $order;
 
         $this->callback_args = $args;
 

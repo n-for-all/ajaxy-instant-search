@@ -1,6 +1,6 @@
 <?php
 
-if (!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
 /**
  * Advanced form for inclusion in the administration panels.
@@ -9,10 +9,10 @@ if (!defined('ABSPATH')) exit;
  * @subpackage Administration
  */
 
-$type = isset($_GET['type']) ? $_GET['type'] : exit();
+$type = sanitize_text_field($_GET['type']);
 $role = false;
 
-$role = get_role($_GET['name']);
+$role = get_role(sanitize_text_field($_GET['name']));
 
 global $wp_roles;
 $roles = $wp_roles->get_names();
@@ -23,7 +23,7 @@ $role_label = isset($roles[$role->name]) ?  $roles[$role->name] : $role->name;
 global $AjaxyLiveSearch;
 $message = false;
 if (!empty($role)) {
-    $is_post = $_POST['sf_post'] ?? false;
+    $is_post = isset($_POST['sf_post']) && !empty($_POST['sf_post']) ? true : false;
     if (!empty($is_post)) {
         if (isset($_REQUEST['_wpnonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_wpnonce'])), 'sf_edit')) {
             if (isset($_POST['sf_' . $role->name]) && !empty($_POST['sf_' . $role->name])) {
@@ -52,16 +52,11 @@ if (!empty($role)) {
         }
     }
 
-
     $setting = (array)$AjaxyLiveSearch->get_setting('role_' . $role->name, false);
-
     $allowed_tags = array('ID', 'user_login', 'user_nicename', 'user_email', 'user_url', 'user_registered', 'display_name', 'author_link');
 
     $title  = sprintf(esc_attr('Edit %s template & settings', "ajaxy-instant-search"), $role_label);
     $notice = '';
-
-
-
 ?>
 
     <div class="wrap">

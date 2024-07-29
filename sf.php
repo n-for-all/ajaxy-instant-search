@@ -165,22 +165,25 @@ class SF
                     }
                 } elseif (isset($_GET['show']) && isset($_GET['name'])) {
                     global $AjaxyLiveSearch;
+
+                    $name = sanitize_text_field(trim($_GET['name']));
                     if ($tab == 'author') {
-                        $setting = (array)$AjaxyLiveSearch->get_setting('role_' . $_GET['name'], $public);
+                        $setting = (array)$AjaxyLiveSearch->get_setting('role_' . $name, $public);
                         $setting['show'] = (int)$_GET['show'];
-                        $AjaxyLiveSearch->set_setting('role_' . $_GET['name'], $setting);
+                        $AjaxyLiveSearch->set_setting('role_' . $name, $setting);
                     } else {
-                        $setting = (array)$AjaxyLiveSearch->get_setting($_GET['name'], $public);
+                        $setting = (array)$AjaxyLiveSearch->get_setting($name, $public);
                         $setting['show'] = (int)$_GET['show'];
-                        $AjaxyLiveSearch->set_setting($_GET['name'], $setting);
+                        $AjaxyLiveSearch->set_setting($name, $setting);
                     }
                     $message = esc_html__('Template modified', "ajaxy-instant-search");
                 }
                 break;
             case 'themes':
                 if (isset($_GET['theme']) && isset($_GET['apply'])) {
-                    $this->set_styles(['theme' => $_GET['theme']]);
-                    $message = $_GET['theme'] . ' theme applied';
+                    $theme = sanitize_text_field(trim($_GET['theme']));
+                    $this->set_styles(['theme' => $theme]);
+                    $message = $theme . ' theme applied';
                 }
                 break;
             default:
@@ -1063,7 +1066,7 @@ class SF
 
     function admin_enqueue_scripts()
     {
-        $tab = $_GET['tab'] ?? 'settings';
+        $tab = \sanitize_text_field($_GET['tab'] ?? 'settings');
         if ($tab == 'preview') {
             wp_enqueue_script('ajaxy-sf-search', AJAXY_SF_PLUGIN_URL . "js/app.js", array(), AJAXY_SF_VERSION, true);
         }
@@ -1117,7 +1120,7 @@ class SF
             }
 
             $css = $this->get_styles()['css'] ?? '';
-            wp_add_inline_style('ajaxy-sf-theme', $css);
+            wp_add_inline_style('ajaxy-sf-theme', wp_strip_all_tags($css));
         }
 
         $styles = $this->get_styles(
@@ -1382,7 +1385,7 @@ class SF
 
     function form_shortcode($atts = array())
     {
-        $m = uniqid('sf');
+        $m = esc_js(uniqid('sf'));
         $scat = (array)$this->get_setting('category');
 
         $styles = $this->get_styles(array(
