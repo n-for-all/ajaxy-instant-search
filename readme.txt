@@ -1,11 +1,11 @@
 === Ajaxy Instant Search ===
 Contributors: n-for-all
 Donate link: http://ajaxy.org/
-Version: 6.0.2
+Version: 6.0.3
 Tags: facebook, live search, ajax search, category search, predictive search
 Requires at least: 6.0.0
 Tested up to: 6.5
-Stable tag: 6.0.2
+Stable tag: 6.0.3
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
