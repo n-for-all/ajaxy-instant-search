@@ -1,11 +1,11 @@
 === Ajaxy Instant Search ===
 Contributors: n-for-all
 Donate link: http://ajaxy.org/
-Version: 6.0.3
+Version: 6.0.4
 Tags: facebook, live search, ajax search, category search, predictive search
 Requires at least: 6.0.0
-Tested up to: 6.5
-Stable tag: 6.0.3
+Tested up to: 6.6
+Stable tag: 6.0.4
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,7 +13,7 @@ A facebook like ajaxy live search for wordpress, this plugin uses the same funct
 
 == Description ==
 
-* This plugin is a an ajax live search that uses the same theme as facebook search, it uses ajax and jQuery to get results from wordpress.
+* This plugin is a an ajax live search that uses the same theme as facebook search, it uses ajax to get results from wordpress.
 
 * 4 themes have been added one light and one dark to fit most blogs need and i am also available to customise each theme to suit your blog.
 
@@ -21,7 +21,7 @@ A facebook like ajaxy live search for wordpress, this plugin uses the same funct
 
 == Installation ==
 
-1. Go to plugin, click add new and search for ajax live search, Alternatively you can upload `ajaxy-search-form` folder to the `/wp-content/plugins/` directory
+1. Go to plugin, click add new and search for ajax live search, Alternatively you can upload `ajaxy-instant-search` folder to the `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
 
 == Frequently Asked Questions ==

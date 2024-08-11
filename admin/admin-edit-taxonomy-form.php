@@ -24,7 +24,7 @@ if (!empty($taxonomy)) {
     if (!empty($is_post)) {
         if (isset($_REQUEST['_wpnonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_wpnonce'])), 'sf_edit')) {
             if (!empty($_POST['sf_' . $taxonomy->name])) {
-                $AjaxyLiveSearch->set_templates($taxonomy->name, sanitize_text_field($_POST['sf_' . $taxonomy->name]));
+                $AjaxyLiveSearch->set_templates($taxonomy->name, $_POST['sf_' . $taxonomy->name]);
             }
 
             $values = array(

@@ -151,7 +151,7 @@ class List_Table extends \WP_List_Table
         $add_class = ($setting['show'] == 1 ? 'row-yes' : 'row-no');
         $this->row_class = ($this->row_class == '' ? 'alternate' : '');
 
-        echo esc_html(sprintf('<tr id="type-%s" class="%s %s">%s</tr>', esc_attr($field['name']), esc_attr($this->row_class), esc_attr($add_class), esc_html($this->single_row_columns($field))));
+        echo sprintf('<tr id="type-%s" class="%s %s">%s</tr>', esc_attr($field['name']), esc_attr($this->row_class), esc_attr($add_class), esc_html($this->single_row_columns($field)));
     }
 
     function column_cb($field)
@@ -205,13 +205,13 @@ class List_Table extends \WP_List_Table
 
         $tab = sanitize_text_field(isset($_GET['tab']) ? $_GET['tab'] : '');
 
-        $actions['edit'] = '<a href="' . $edit_link . '">' . esc_html_e('Edit template & Settings', "ajaxy-instant-search") . '</a>';
+        $actions['edit'] = '<a href="' . $edit_link . '">' . esc_html('Edit template & Settings', "ajaxy-instant-search") . '</a>';
 
         $setting = (array)$AjaxyLiveSearch->get_setting($this->setting_prefix . $field['name'], $this->public);
         if ($setting['show'] == 1) :
-            $actions['hide'] = "<a class='hide-field' href='" . wp_nonce_url(menu_page_url('ajaxy_sf_admin', false) . '&amp;name=' . $field['name'] . '&amp;type=' . $field['type'] . '&amp;show=0&amp;tab=' . $tab, 'hide-post_type_' . $field['name']) . "'>" . esc_html_e('Hide from results', "ajaxy-instant-search") . "</a>";
+            $actions['hide'] = "<a class='hide-field' href='" . wp_nonce_url(menu_page_url('ajaxy_sf_admin', false) . '&amp;name=' . $field['name'] . '&amp;type=' . $field['type'] . '&amp;show=0&amp;tab=' . $tab, 'hide-post_type_' . $field['name']) . "'>" . esc_html('Hide from results', "ajaxy-instant-search") . "</a>";
         else :
-            $actions['show'] = "<a class='show-field' href='" . wp_nonce_url(menu_page_url('ajaxy_sf_admin', false) . '&amp;name=' . $field['name'] . '&amp;type=' . $field['type'] . '&amp;show=1&amp;tab=' . $tab, 'show-post_type_' . $field['name']) . "'>" . esc_html_e('show in results', "ajaxy-instant-search") . "</a>";
+            $actions['show'] = "<a class='show-field' href='" . wp_nonce_url(menu_page_url('ajaxy_sf_admin', false) . '&amp;name=' . $field['name'] . '&amp;type=' . $field['type'] . '&amp;show=1&amp;tab=' . $tab, 'show-post_type_' . $field['name']) . "'>" . esc_html('show in results', "ajaxy-instant-search") . "</a>";
         endif;
         $out .= $this->row_actions($actions);
         $out .= '<div class="hidden" id="inline_' . $field['name'] . '">';

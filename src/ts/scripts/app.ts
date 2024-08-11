@@ -5,7 +5,7 @@ declare let AjaxyLiveSearchSettings: any, window: any;
 class SFResults {
 	element: HTMLUListElement;
 	items: Array<HTMLElement> = [];
-	parent: SF;
+	parent: SFInput;
 	constructor(data, parent) {
 		this.items = [];
 		this.parent = parent;
@@ -178,6 +178,15 @@ class SFResults {
 	isString = (str) => Object.prototype.toString.call(str) === "[object String]";
 }
 class SF {
+	inputs = [];
+	constructor(selector: string, options) {
+		let inputs = document.querySelectorAll(selector);
+		inputs.forEach((input: HTMLElement) => {
+			this.inputs.push(new SFInput(input, options));
+		});
+	}
+}
+class SFInput {
 	input = null;
 	timeout = null;
 	options = null;
@@ -217,10 +226,10 @@ class SF {
 		search: false,
 	};
 
-	constructor(selector: string, options) {
-		this.input = document.querySelector(selector);
+	constructor(element: HTMLElement, options) {
+		this.input = element;
 		if (!this.input) {
-			console.warn(`Ajaxy Instant Search can't find input ${selector}`);
+			console.warn(`Ajaxy Instant Search can't find input`);
 			return;
 		}
 		this.timeout = null;
@@ -241,7 +250,7 @@ class SF {
 
 		this.mainElem.style.position = "absolute";
 		this.mainElem.style.display = "none";
-		this.mainElem.style.width = `${options.width}`;
+		this.mainElem.style.width = `${options.width <= 0 ? this.input.clientWidth : options.width}${options.width_unit}`;
 		this.mainElem.style.zIndex = "9999";
 
 		let mainCont = document.createElement("div");
@@ -394,6 +403,7 @@ class SF {
 			if (this.mainElem.style.display == "none") {
 				return;
 			}
+            this.mainElem.style.width = `${this.options.width <= 0 ? this.input.clientWidth : this.options.width}${this.options.width_unit}`;
 			this.adjustPosition();
 		});
 
@@ -405,14 +415,7 @@ class SF {
 		});
 
 		this.input.addEventListener("keyup", (event) => {
-			if (
-				event.key != "ArrowUp" &&
-				event.key != "ArrowDown" &&
-				event.key != "Enter" &&
-				event.key != "Escape" &&
-				event.key != "ArrowRight" &&
-				event.key != "ArrowLeft"
-			) {
+			if (event.key != "ArrowUp" && event.key != "ArrowDown" && event.key != "Enter" && event.key != "Escape" && event.key != "ArrowRight" && event.key != "ArrowLeft") {
 				if (this.timeout != null) {
 					clearTimeout(this.timeout);
 				}

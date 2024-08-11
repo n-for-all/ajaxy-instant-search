@@ -20,7 +20,7 @@ if (!empty($post_type)) {
     if (!empty($_POST['sf_post'])) {
         if (isset($_REQUEST['_wpnonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_wpnonce'])), 'sf_edit')) {
             if (isset($_POST['sf_' . $post_type->name]) && !empty($_POST['sf_' . $post_type->name])) {
-                $AjaxyLiveSearch->set_templates($post_type->name, sanitize_text_field($_POST['sf_' . $post_type->name]));
+                $AjaxyLiveSearch->set_templates($post_type->name, $_POST['sf_' . $post_type->name]);
             }
 
             $values = array(

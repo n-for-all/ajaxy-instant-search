@@ -13,7 +13,7 @@ if (isset($_POST['sf_rsubmit']) && isset($_POST['_wpnonce']) && wp_verify_nonce(
 } elseif (isset($_POST['sf_submit']) && isset($_POST['_wpnonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])))) {
     $styles = $_POST['sf']['style'];
 
-    $more_results = sanitize_text_field(isset($_POST['sf']['template']) ? $_POST['sf']['template']['more_results'] : '');
+    $more_results = isset($_POST['sf']['template']) ? $_POST['sf']['template']['more_results'] : '';
     $values = [
         'search_label' => sanitize_text_field($styles['label'] ?? 'Search'),
         'input_id' => sanitize_text_field($styles['input_id']),

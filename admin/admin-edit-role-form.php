@@ -27,7 +27,7 @@ if (!empty($role)) {
     if (!empty($is_post)) {
         if (isset($_REQUEST['_wpnonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_wpnonce'])), 'sf_edit')) {
             if (isset($_POST['sf_' . $role->name]) && !empty($_POST['sf_' . $role->name])) {
-                $AjaxyLiveSearch->set_templates('role_' . $role->name, sanitize_text_field($_POST['sf_' . $role->name]));
+                $AjaxyLiveSearch->set_templates('role_' . $role->name, $_POST['sf_' . $role->name]);
             }
 
             $values = array(

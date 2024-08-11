@@ -111,7 +111,7 @@ class Themes extends \WP_List_Table
         $add_class = ($field['title'] == $theme ? 'row-yes' : 'row-no');
         $row_class = ($row_class == '' ? ' alternate ' . $add_class : $add_class);
 
-        echo esc_html(sprintf('<tr id="type-sf-theme" class="%s">%s</tr>', esc_attr($row_class), esc_html($this->single_row_columns($field))));
+        echo sprintf('<tr id="type-sf-theme" class="%s">%s</tr>', esc_attr($row_class), esc_html($this->single_row_columns($field)));
     }
 
     function column_cb($field)
@@ -140,9 +140,9 @@ class Themes extends \WP_List_Table
         endif;
 
         /* translators: %s is replaced with the theme name */
-        $out = sprintf('<strong><a class="row-title" href="%s" title="%s">%s</a></strong><br />%s<div class="hidden" id="inline_">%s<div class="name">%s</div></div>', $edit_link, esc_attr(sprintf(__('Edit &#8220;%s&#8221;', 'ajaxy-instant-search'), $name)), esc_attr($name), esc_attr($this->row_actions($actions)), esc_attr($field['title']), esc_attr($field['title']));
+        $out = sprintf('<strong><a class="row-title" href="%s" title="%s">%s</a></strong><br />%s<div class="hidden" id="inline_">%s<div class="name">%s</div></div>', $edit_link, esc_attr(sprintf(__('Edit &#8220;%s&#8221;', 'ajaxy-instant-search'), $name)), esc_attr($name), $this->row_actions($actions), esc_attr($field['title']), esc_attr($field['title']));
 
-        return esc_html($out);
+        return $out;
     }
     function column_theme_name($field)
     {

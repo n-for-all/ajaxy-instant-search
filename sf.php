@@ -7,7 +7,7 @@
 	Plugin Name: Ajaxy Instant Search
 	Plugin URI: https://www.ajaxy.org/ajaxy-live-search-plugin
 	Description: Transfer wordpress form into an advanced ajax search form the same as facebook live search, This version supports themes and can work with almost all themes without any modifications
-	Version: 6.0.3
+	Version: 6.0.4
 	Author: Naji Amer (Ajaxy)
 	Author URI: https://www.ajaxy.org
 	License: GPLv2 or later
@@ -1145,7 +1145,8 @@ class SF
                         'text' => $styles['search_label'],
                         'delay' => $styles['delay'],
                         'iwidth' => $styles['width'],
-                        'width' => $styles['results_width'] . $styles['results_width_unit'],
+                        'width' => $styles['results_width'],
+                        'width_unit' => $styles['results_width_unit'],
                         'ajaxUrl' => $this->get_ajax_url(),
                         'rtl' => $this->is_rtl()
                     )
@@ -1441,7 +1442,7 @@ class SF
 function ajaxy_search_form($settings = array())
 {
     global $AjaxyLiveSearch;
-    echo esc_html($AjaxyLiveSearch->form_shortcode($settings));
+    echo $AjaxyLiveSearch->form_shortcode($settings); 
 }
 global $AjaxyLiveSearch;
 $AjaxyLiveSearch = new SF();
