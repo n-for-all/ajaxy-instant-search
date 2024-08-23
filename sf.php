@@ -667,7 +667,7 @@ class SF
         $categories = array();
         $setting = (object)$this->get_setting($taxonomy);
 
-        $excludes = "";
+        $excludes = null;
         if (isset($setting->excludes) && sizeof($setting->excludes) > 0 && is_array($setting->excludes)) {
             $excludes = " AND $wpdb->terms.term_id NOT IN (" . implode(',', $setting->excludes) . ")";
         }
@@ -685,10 +685,9 @@ class SF
 			WHERE
 				name LIKE %s
 				AND $wpdb->term_taxonomy.taxonomy = %s
-				AND $wpdb->term_taxonomy.term_id = $wpdb->terms.term_id
-			%s
+				AND $wpdb->term_taxonomy.term_id = $wpdb->terms.term_id 
+                %1s
 			LIMIT 0, %d", '%' . $wpdb->esc_like($name) . '%', $taxonomy, $excludes, $setting->limit));
-
         if (sizeof($results) > 0 && is_array($results) && !is_wp_error($results)) {
             foreach ($results as $result) {
                 /** @disregard */
@@ -823,8 +822,8 @@ class SF
                     (post_title LIKE %s or post_content LIKE %s)
                     AND post_status='publish'
                     AND post_type = %s
-                    %s
-                    %s
+                    %1s
+                    %1s
                 LIMIT 0, %d", $search, $search, $post_type, $excludes, $order_results, $setting->limit));
         } else {
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -837,8 +836,8 @@ class SF
                     (post_title LIKE %s)
                     AND post_status='publish'
                     AND post_type = %s
-                    %s
-                    %s
+                    %1s
+                    %1s
                 LIMIT 0, %d", $search, $post_type, $excludes, $order_results, $setting->limit));
         }
 

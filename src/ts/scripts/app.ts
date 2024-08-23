@@ -250,7 +250,8 @@ class SFInput {
 
 		this.mainElem.style.position = "absolute";
 		this.mainElem.style.display = "none";
-		this.mainElem.style.width = `${options.width <= 0 ? this.input.clientWidth : options.width}${options.width_unit}`;
+		let clientWidth = this.input.clientWidth > 0 ? this.input.clientWidth : "200";
+		this.mainElem.style.width = `${options.width <= 0 ? clientWidth : options.width}${options.width_unit}`;
 		this.mainElem.style.zIndex = "9999";
 
 		let mainCont = document.createElement("div");
@@ -306,6 +307,9 @@ class SFInput {
 	loadResults() {
 		if (this.input.value != "") {
 			this.loader(this.input.value);
+
+			let clientWidth = this.input.clientWidth > 0 ? this.input.clientWidth : "200";
+			this.mainElem.style.width = `${this.options.width <= 0 ? clientWidth : this.options.width}${this.options.width_unit}`;
 
 			this.mainElem.style.display = "block";
 			this.adjustPosition();
@@ -403,7 +407,7 @@ class SFInput {
 			if (this.mainElem.style.display == "none") {
 				return;
 			}
-            this.mainElem.style.width = `${this.options.width <= 0 ? this.input.clientWidth : this.options.width}${this.options.width_unit}`;
+			this.mainElem.style.width = `${this.options.width <= 0 ? this.input.clientWidth : this.options.width}${this.options.width_unit}`;
 			this.adjustPosition();
 		});
 
